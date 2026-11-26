@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        (function () {
+            const firstLoadKey = 'rf_first_load_done';
+            if (new URLSearchParams(window.location.search).get('login') !== '1' && !sessionStorage.getItem(firstLoadKey)) {
+                sessionStorage.setItem(firstLoadKey, '1');
+                window.location.replace('landingpage.html');
+                return;
+            }
+        }());
+    </script>
     <link rel="icon" type="image/png" href="685667950_851931460606770_7624076952502804008_n-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <meta charset="UTF-8">
@@ -173,12 +183,16 @@
             white-space: nowrap;
             overflow: hidden;
             line-height: 1.2;
-            font-size: clamp(0.5rem, 3.8vw, 3.5rem);
+            font-size: clamp(0.5rem, 3vw, 3.5rem);
             letter-spacing: 1px;
         }
 
         .brand-title span:first-child {
             font-size: clamp(0.8rem, 4.2vw, 3.5rem);
+        }
+
+        .brand-title span:empty {
+            display: none;
         }
 
         /* ── Terms checkbox row ── */
@@ -473,9 +487,9 @@
             <div class="sidebar-content">
                 <h1 class="brand-title" id="brandTitle">
                     <span>RENTAL</span>
-                    <span>MANAGE</span>
-                    <span>MENT</span>
+                    <span>MANAGEMENT</span>
                     <span>SYSTEM</span>
+                    <span></span>
                 </h1>
             </div>
         </div>
@@ -798,7 +812,7 @@
         function applySystemNameToBrand(name) {
             var el = document.getElementById('brandTitle');
             if (!el) return;
-            var DEFAULT_WORDS = ['RENTAL', 'MANAGE', 'MENT', 'SYSTEM'];
+            var DEFAULT_WORDS = ['RENTAL', 'MANAGEMENT', 'SYSTEM', ''];
             var words;
             if (name && name.trim()) {
                 var raw = name.trim().toUpperCase().split(/\s+/);
@@ -932,6 +946,18 @@
 
         let selectedRole = 'tenant';
 
+        function getPostAuthDestination(role) {
+            const returnTo = new URLSearchParams(window.location.search).get('returnTo');
+            if (role === 'tenant' && returnTo) {
+                const [page, query = ''] = returnTo.split('?', 2);
+                const room = page === 'booking.html' ? new URLSearchParams(query).get('room') : '';
+                if (room) {
+                    return `booking.html?room=${encodeURIComponent(room)}`;
+                }
+            }
+            return role === 'tenant' ? 'dashboard-tenant.html' : 'dashboard.html';
+        }
+
         const registerBtn   = document.getElementById('registerBtn');
         const closeModal    = document.getElementById('closeModal');
         const registerModal = document.getElementById('registerModal');
@@ -982,7 +1008,7 @@
 
                 if (rememberMe) localStorage.setItem('rememberedEmail', email);
                 else localStorage.removeItem('rememberedEmail');
-                window.location.href = userData.role === 'tenant' ? 'dashboard-tenant.html' : 'dashboard.html';
+                window.location.href = getPostAuthDestination(userData.role);
             } catch (error) {
                 loginError.textContent = error.message || 'Login failed. Please try again.';
                 loginError.classList.add('show');
@@ -1060,7 +1086,7 @@
 
                 alert(`Welcome ${fullName}! Registration successful as ${selectedRole}`);
                 registerModal.classList.remove('active');
-                window.location.href = selectedRole === 'tenant' ? 'dashboard-tenant.html' : 'dashboard.html';
+                window.location.href = getPostAuthDestination(selectedRole);
             } catch (error) {
                 const errorMessage = document.getElementById('registerError');
                 if (error.code === 'auth/email-already-in-use') {

@@ -1,0 +1,315 @@
+<!--
+  RentFlow loading screen (progress-ring version)
+  -----------------------------------------------
+  The ring starts empty at the top, fills clockwise to a full circle in ~4 seconds,
+  flashes once, then the screen fades out. It does NOT loop.
+
+  Paste the three marked parts into your index.html:
+    1) <link> + <style>  -> inside <head>, as early as possible
+    2) <div id="rf-loader"> -> first element inside <body>
+    3) <script>          -> right after the loader markup (inline, not deferred)
+
+  LOGO PATH: assumes index.html is in the same folder as the logo (project root).
+  If not, add the right prefix (e.g. "../") in BOTH the <link> and the <img>.
+-->
+
+<!-- ============ 1) HEAD: preload + styles ============ -->
+<link rel="preload" as="image" href="ERROR_404_Rental_Management-main/logoRent.png">
+
+<style>
+  :root {
+    /* Palette taken from the RentFlow logo */
+    --rf-navy: #0b1440;
+    --rf-blue: #1f2f86;
+    --rf-blue-bright: #2e5fd1;  /* start of the ring (readable on dark) */
+    --rf-green: #8cc063;
+    --rf-lime: #a6d04f;
+    --rf-cyan: #4fc3ec;
+    --rf-ice: #f2ffd6;
+
+    --rf-pulse: 4.2s;           /* slow glow pulse behind the logo */
+
+    --rf-ring-size: clamp(170px, 40vmin, 320px);
+    --rf-ring-width: clamp(4px, 0.9vmin, 7px);
+
+    --p: 0;                     /* ring progress in degrees (0-360), set by the script */
+  }
+
+  html.rf-loading,
+  html.rf-loading body { overflow: hidden; }
+  html, body {
+    min-height: 100%;
+    margin: 0;
+    background: var(--rf-navy);
+  }
+
+  #rf-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 0%, rgba(140, 192, 99, 0.32) 0%, transparent 70%),
+      radial-gradient(ellipse 85% 60% at 50% 100%, rgba(31, 47, 134, 0.75) 0%, transparent 70%),
+      linear-gradient(180deg, #0d2a2b 0%, #0e2d42 48%, var(--rf-navy) 100%);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease, visibility 0s linear 0.8s;
+  }
+  #rf-loader.rf-hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .rf-stage {
+    position: relative;
+    width: var(--rf-ring-size);
+    height: var(--rf-ring-size);
+    display: grid;
+    place-items: center;
+  }
+
+  .rf-glow {
+    position: absolute;
+    inset: 14%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(140, 192, 99, 0.5) 0%, rgba(79, 195, 236, 0.3) 48%, transparent 72%);
+    filter: blur(14px);
+    animation: rf-pulse var(--rf-pulse) ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+
+  .rf-logo-box {
+    position: relative;
+    width: 62%;
+    height: 62%;
+    display: grid;
+    place-items: center;
+    animation: rf-logo-pulse var(--rf-pulse) ease-in-out infinite;
+    will-change: transform;
+  }
+  .rf-logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(79, 195, 236, 0.35));
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Faint full-circle track so the end point is visible from the start */
+  .rf-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 var(--rf-ring-width) rgba(79, 195, 236, 0.14);
+  }
+
+  /* One-time flash when the ring completes */
+  .rf-flash {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(79, 195, 236, 0), inset 0 0 0 0 rgba(166, 208, 79, 0);
+    transition: box-shadow 0.45s ease;
+  }
+  .rf-stage.rf-done .rf-flash {
+    box-shadow: 0 0 34px 6px rgba(79, 195, 236, 0.55), inset 0 0 30px 4px rgba(166, 208, 79, 0.35);
+  }
+
+  /* Progress ring: the arc grows from 0 to var(--p) degrees */
+  .rf-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      var(--rf-blue-bright) 0deg,
+      var(--rf-cyan) calc(var(--p) * 0.65deg),
+      var(--rf-lime) calc(var(--p) * 0.97deg),
+      var(--rf-ice) calc(var(--p) * 1deg),
+      transparent calc(var(--p) * 1deg)
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--rf-ring-width)), #000 calc(100% - var(--rf-ring-width) + 1px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - var(--rf-ring-width)), #000 calc(100% - var(--rf-ring-width) + 1px));
+  }
+  /* Glowing head that rides the end of the arc */
+  .rf-head {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    transform: rotate(calc(var(--p) * 1deg));
+    opacity: calc(var(--p) / 6); /* hidden at the very start, fully visible after ~6deg */
+  }
+  .rf-head::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: calc(var(--rf-ring-width) * 1.9);
+    height: calc(var(--rf-ring-width) * 1.9);
+    margin-left: calc(var(--rf-ring-width) * -0.95);
+    margin-top: calc(var(--rf-ring-width) * -0.45);
+    border-radius: 50%;
+    background: var(--rf-ice);
+    box-shadow:
+      0 0 8px 2px rgba(242, 255, 214, 0.9),
+      0 0 22px 6px rgba(166, 208, 79, 0.65),
+      0 0 44px 12px rgba(79, 195, 236, 0.45);
+  }
+
+  @keyframes rf-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(0.94); }
+    50%      { opacity: 1;   transform: scale(1.06); }
+  }
+  @keyframes rf-logo-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rf-glow, .rf-logo-box { animation: none; }
+    .rf-glow { opacity: 0.8; }
+  }
+</style>
+
+<script>
+  document.documentElement.classList.add('rf-loading');
+</script>
+
+
+<!-- ============ 2) BODY: first element inside <body> ============ -->
+<div id="rf-loader" role="progressbar" aria-label="Loading RentFlow" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="rf-stage" id="rf-stage">
+    <div class="rf-glow"></div>
+    <div class="rf-track"></div>
+    <div class="rf-flash"></div>
+    <div class="rf-ring"></div>
+    <div class="rf-head"></div>
+    <div class="rf-logo-box">
+      <img id="rf-logo" alt="RentFlow"
+           src="ERROR_404_Rental_Management-main/logoRent.png"
+           decoding="async" fetchpriority="high">
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ 3) SCRIPT: drives the ring and hides the loader ============ -->
+<script>
+(function () {
+  var loader = document.getElementById('rf-loader');
+  var stage = document.getElementById('rf-stage');
+  if (!loader || !stage) return;
+
+  var root = document.documentElement;
+
+  /* How long the ring takes to fill (ms). 4000 = 4 seconds. */
+  var DURATION_MS = 4000;
+  /* If the app is not ready yet when the ring gets here, it waits at this point. */
+  var HOLD_AT = 0.95;
+
+  var tasksDone = false;
+  var finished = false;
+  var start = null;
+
+  /* Logo fallback: if the path in the <img> is wrong for the page this loader is on
+     (e.g. the page is inside a subfolder), try the common alternatives. */
+  var logo = document.getElementById('rf-logo');
+  var LOGO_FILE = 'logoRent.png';
+  var PREFIXES = ['ERROR_404_Rental_Management-main/', '', '/', '../', '../../', 'assets/', 'images/', 'img/']; // index 0 = current src
+  var prefixTried = 1;
+  function tryNextLogoPath() {
+    if (prefixTried >= PREFIXES.length) {
+      console.warn('[RentFlow loader] Logo not found. Check the file name and path in the <img> and <link>.');
+      return;
+    }
+    logo.src = PREFIXES[prefixTried++] + LOGO_FILE;
+  }
+  if (logo) {
+    logo.addEventListener('error', tryNextLogoPath);
+    if (logo.complete && logo.naturalWidth === 0) tryNextLogoPath(); // already failed before this ran
+  }
+
+  /* Real startup tasks. The ring can only complete once these are done. */
+  var tasks = [
+    new Promise(function (resolve) {
+      if (document.readyState === 'complete') resolve();
+      else window.addEventListener('load', resolve, { once: true });
+    }),
+    document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
+    (function () {
+      var img = document.getElementById('rf-logo');
+      return img && img.decode ? img.decode().catch(function () {}) : Promise.resolve();
+    })()
+  ];
+
+  /* Public hook: keep the ring from completing until your own init is done.
+     Example:  RentFlowLoader.wait(initAuthAndLoadData());                  */
+  window.RentFlowLoader = {
+    wait: function (promise) { tasks.push(Promise.resolve(promise)); },
+    hide: hide
+  };
+
+  function settle() {
+    var count = tasks.length;
+    Promise.allSettled(tasks).then(function () {
+      if (tasks.length > count) settle();
+      else tasksDone = true;
+    });
+  }
+  settle();
+
+  function ease(t) { // smooth start and finish
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function setProgress(frac) {
+    stage.style.setProperty('--p', (frac * 360).toFixed(2));
+    loader.setAttribute('aria-valuenow', Math.round(frac * 100));
+  }
+
+  function tick(now) {
+    if (finished) return;
+    if (start === null) start = now;
+    var t = Math.min((now - start) / DURATION_MS, 1);
+    var p = ease(t);
+    if (!tasksDone) p = Math.min(p, HOLD_AT);
+
+    setProgress(p);
+
+    if (p >= 1) { complete(); return; }
+    requestAnimationFrame(tick);
+  }
+
+  function complete() {
+    stage.classList.add('rf-done');       // one-time flash
+    setTimeout(hide, 500);                // let the flash show, then fade out
+  }
+
+  function hide() {
+    if (finished) return;
+    finished = true;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        loader.classList.add('rf-hide');
+        root.classList.remove('rf-loading');
+        setTimeout(function () {
+          loader.remove();
+          window.location.replace('room-ads.html');
+        }, 800);
+      });
+    });
+  }
+
+  requestAnimationFrame(tick);
+
+  /* Safety net only: never leave users stuck on a broken load */
+  setTimeout(hide, 20000);
+})();
+</script>

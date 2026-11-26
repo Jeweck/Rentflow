@@ -268,6 +268,17 @@
             font-size: 14px;
         }
 
+        .tenant-data-notice {
+            display: none;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            background: #fffbeb;
+            color: #92400e;
+            font-size: 13px;
+        }
+
         .t-modal-overlay {
             display: none;
             position: fixed;
@@ -382,6 +393,106 @@
         }
 
         .t-del-btn:hover { background: #c42a3c; }
+
+        html[data-theme="dark"] body,
+        html[data-theme="dark"] .dashboard-container,
+        html[data-theme="dark"] .page-body {
+            background: #111827;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .dashboard-header,
+        html[data-theme="dark"] .stat-card,
+        html[data-theme="dark"] .tenants-table-wrap,
+        html[data-theme="dark"] .t-modal {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        html[data-theme="dark"] .tenants-page-title,
+        html[data-theme="dark"] .stat-neutral,
+        html[data-theme="dark"] .tenants-table td,
+        html[data-theme="dark"] .tenant-name-text,
+        html[data-theme="dark"] .t-modal-title,
+        html[data-theme="dark"] .t-confirm-title,
+        html[data-theme="dark"] .user-profile-name {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .tenants-count-badge,
+        html[data-theme="dark"] .stat-card-label,
+        html[data-theme="dark"] .tenant-contact-sub,
+        html[data-theme="dark"] .user-profile-email,
+        html[data-theme="dark"] .t-form-label,
+        html[data-theme="dark"] .t-modal small,
+        html[data-theme="dark"] .t-confirm-msg {
+            color: #9ca3af;
+        }
+
+        html[data-theme="dark"] .tenant-search-wrap input,
+        html[data-theme="dark"] .tenants-filters select,
+        html[data-theme="dark"] .t-form-input,
+        html[data-theme="dark"] .t-form-select {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .tenant-search-wrap input::placeholder,
+        html[data-theme="dark"] .t-form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        html[data-theme="dark"] .tenants-table th {
+            background: #172033;
+            color: #9ca3af;
+            border-color: #374151;
+        }
+
+        html[data-theme="dark"] .tenants-table td,
+        html[data-theme="dark"] .tenants-table tbody tr:hover td {
+            border-color: #374151;
+        }
+
+        html[data-theme="dark"] .tenants-table tbody tr:hover td {
+            background: #263244;
+        }
+
+        html[data-theme="dark"] .t-icon-btn {
+            border-color: #4b5563;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .t-icon-btn:hover {
+            background: #263244;
+        }
+
+        html[data-theme="dark"] .t-cancel-btn {
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .t-close-btn {
+            color: #9ca3af;
+        }
+
+        html[data-theme="dark"] .t-close-btn:hover {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .t-cancel-btn:hover {
+            background: #374151;
+        }
+
+        html[data-theme="dark"] .t-modal-overlay {
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        html[data-theme="dark"] .tenant-data-notice {
+            background: #3b2f12;
+            border-color: #785b1e;
+            color: #fcd34d;
+        }
     </style>
 </head>
 
@@ -426,7 +537,7 @@
                     Tenants
                     <span class="tenants-count-badge" id="tenantsCountBadge">0 tenants</span>
                 </div>
-                <button class="add-tenant-btn" id="addTenantBtn" onclick="openAddTenant()">
+                <button class="add-tenant-btn" id="addTenantBtn">
                     <i class="fas fa-plus"></i> Add Tenant
                 </button>
             </div>
@@ -476,6 +587,7 @@
             </div>
 
             <!-- Tenants Table -->
+            <div class="tenant-data-notice" id="tenantDataNotice" role="status"></div>
             <div class="tenants-table-wrap">
                 <table class="tenants-table" id="tenantsTable">
                     <thead>
@@ -515,7 +627,7 @@
                 <input class="t-form-input" id="tFirstName" placeholder="Juan" />
             </div>
             <div class="t-form-group">
-                <label class="t-form-label">Last Name</label>
+                <label class="t-form-label">Last Name (optional)</label>
                 <input class="t-form-input" id="tLastName" placeholder="dela Cruz" />
             </div>
         </div>
@@ -537,8 +649,8 @@
                 <input class="t-form-input" type="date" id="tMoveIn" />
             </div>
             <div class="t-form-group">
-                <label class="t-form-label">Due Day (1–28)</label>
-                <input class="t-form-input" type="number" id="tDueDay" min="1" max="28" placeholder="1" />
+                <label class="t-form-label">Monthly Rent Due Day (1–28)</label>
+                <input class="t-form-input" type="number" id="tDueDay" min="1" max="28" step="1" placeholder="1" />
             </div>
         </div>
 
@@ -548,12 +660,18 @@
         </div>
 
         <div class="t-form-group">
+            <label class="t-form-label">Tenant Account Email</label>
+            <input class="t-form-input" type="email" id="tEmail" placeholder="tenant@example.com" />
+            <small style="display:block;margin-top:6px;color:#888;font-size:11px;">Used to link this tenant’s login to their bills and submitted receipts.</small>
+        </div>
+
+        <div class="t-form-group">
             <label class="t-form-label">Status</label>
             <select class="t-form-select" id="tStatus">
                 <option value="Active">Active</option>
                 <option value="Pending">Pending</option>
-                <option value="Overdue">Overdue</option>
             </select>
+            <small style="display:block;margin-top:6px;color:#888;font-size:11px;">Overdue status is calculated automatically from unpaid billing due dates.</small>
         </div>
 
         <div class="t-modal-footer">

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentFlow – Rental management, made simple</title>
+<meta name="description" content="RentFlow brings tenants, billing, payments, and rental records together in one place.">
+<link rel="icon" type="image/png" href="685667950_851931460606770_7624076952502804008_n-removebg-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+<style>
+/* RentFlow landing page — self-contained, does not use or alter styles.css */
+:root{
+  --navy:#0f2a44; --navy-2:#173a5c; --accent:#2C96CD; --accent-d:#1e7aab; --accent-l:#e6f3fa;
+  --bg:#ffffff; --soft:#f5f8fb; --line:#e3eaf0; --text:#1b2b3b; --muted:#5d6f80;
+  --ok:#16a34a; --ok-bg:#dcfce7; --warn:#d97706; --warn-bg:#fef3c7; --info:#0284c7; --info-bg:#e0f2fe;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--text);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+section{padding:96px 0}
+h1,h2,h3{line-height:1.15;color:var(--navy);letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,3.2vw,2.4rem);font-weight:800}
+h3{font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+p{color:var(--muted)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 .95rem/1 inherit;font-family:inherit;padding:14px 24px;border-radius:10px;border:1.5px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-d);transform:translateY(-1px)}
+.btn-ghost{border-color:rgba(255,255,255,.28);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-sm{padding:10px 18px;font-size:.88rem}
+
+/* Navbar */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.2rem;color:var(--navy);letter-spacing:-.02em}
+.brand img{width:34px;height:34px;object-fit:contain}
+.nav-links{display:flex;align-items:center;gap:30px;list-style:none}
+.nav-links a:not(.btn){font-weight:500;font-size:.93rem;color:var(--muted);transition:color .2s}
+.nav-links a:not(.btn):hover{color:var(--navy)}
+.menu-btn{display:none;background:none;border:0;font-size:1.3rem;color:var(--navy);cursor:pointer;padding:8px}
+
+/* Hero */
+.hero{background:var(--navy);padding:84px 0 96px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.hero h1{color:#fff;font-size:clamp(2.3rem,5vw,3.6rem);font-weight:800}
+.hero p{color:#b9cbdb;font-size:1.08rem;margin:22px 0 34px;max-width:52ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px}
+.hero-copy{animation:rise .7s ease both}
+.hero-mock{animation:rise .7s .12s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* Dashboard preview (illustrative, no real data) */
+.mock{background:#fff;border-radius:16px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);display:grid;grid-template-columns:52px 1fr;overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+.mock-side{background:var(--soft);border-right:1px solid var(--line);padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:16px;color:#9db0c0;font-size:.9rem}
+.mock-side .on{color:#fff;background:var(--accent);width:32px;height:32px;border-radius:9px;display:grid;place-items:center}
+.mock-main{padding:18px}
+.mock-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-weight:700;color:var(--navy);font-size:.92rem}
+.mock-top i{color:var(--accent);margin-right:6px}
+.mock-tabs{display:flex;gap:6px;margin-bottom:14px;font-size:.72rem;font-weight:600}
+.mock-tabs span{padding:5px 12px;border-radius:20px;background:var(--soft);color:var(--muted)}
+.mock-tabs .on{background:var(--accent-l);color:var(--accent-d)}
+.mock-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px}
+.mock-row .av{width:32px;height:32px;border-radius:50%;background:var(--accent-l);color:var(--accent-d);display:grid;place-items:center;font-size:.75rem;flex-shrink:0}
+.mock-row .ln{flex:1;display:grid;gap:6px}
+.mock-row .ln b{height:8px;width:55%;background:#d3dee8;border-radius:4px}
+.mock-row .ln i{height:6px;width:35%;background:#e8eef3;border-radius:4px}
+.pill{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:20px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.wait{background:var(--warn-bg);color:var(--warn)}
+.pill.chk{background:var(--info-bg);color:var(--info)}
+.mock-note{font-size:.72rem;color:#8a9aa9;text-align:center;margin-top:12px}
+
+/* About */
+.about .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
+.about p{font-size:1.05rem}
+
+/* Features */
+.features{background:var(--soft)}
+.sec-head{max-width:620px;margin-bottom:48px}
+.sec-head p{margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.ico{width:46px;height:46px;border-radius:12px;background:var(--accent-l);color:var(--accent-d);display:grid;place-items:center;font-size:1.1rem;margin-bottom:18px}
+.card p{font-size:.94rem;margin-top:8px}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;counter-reset:s}
+.step{padding:0 28px 0 0;position:relative}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;margin-bottom:20px;position:relative;z-index:1}
+.step::after{content:"";position:absolute;top:22px;left:44px;right:0;height:2px;background:var(--line)}
+.step:last-child::after{display:none}
+.step p{margin-top:8px;font-size:.95rem}
+
+/* Roles */
+.roles{background:var(--soft)}
+.roles .wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.role{border-radius:20px;padding:44px 40px}
+.role.land{background:var(--navy)}
+.role.land h2{color:#fff}
+.role.land>p{color:#b9cbdb}
+.role.ten{background:#fff;border:1px solid var(--line)}
+.role h2{font-size:clamp(1.5rem,2.6vw,2rem)}
+.role>p{margin:14px 0 24px}
+.role ul{list-style:none;display:grid;gap:12px}
+.role li{display:flex;gap:12px;align-items:center;font-weight:500;font-size:.95rem}
+.role.land li{color:#e4edf5}
+.role li i{color:var(--accent);font-size:.9rem}
+
+/* CTA */
+.cta{padding:0 0 96px;background:var(--soft)}
+.cta-box{background:var(--accent);border-radius:22px;padding:64px 32px;text-align:center}
+.cta-box h2{color:#fff;max-width:20ch;margin:0 auto}
+.cta-box p{color:#e6f4fb;margin:16px auto 30px;max-width:50ch}
+.cta-box .btn{background:#fff;color:var(--navy)}
+.cta-box .btn:hover{background:var(--navy);color:#fff}
+
+/* Footer */
+footer{background:var(--navy);color:#b9cbdb;padding:56px 0 28px}
+.foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,.12)}
+.foot .brand{color:#fff;margin-bottom:12px}
+.foot p{color:#9db3c6;max-width:38ch;font-size:.92rem}
+.foot ul{list-style:none;display:flex;gap:28px;flex-wrap:wrap;align-self:flex-start;padding-top:6px}
+.foot ul a{font-size:.93rem;transition:color .2s}
+.foot ul a:hover{color:#fff}
+.copy{padding-top:24px;font-size:.85rem;color:#8ba3b8}
+
+/* Responsive */
+@media (max-width:960px){
+  section{padding:72px 0}
+  .hero .wrap,.about .wrap{grid-template-columns:1fr;gap:40px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .roles .wrap{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .menu-btn{display:block}
+  .nav-links{position:absolute;top:68px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:0;padding:8px 20px 20px;display:none}
+  .nav-links.open{display:flex}
+  .nav-links li{padding:6px 0}
+  .nav-links .btn{width:100%;margin-top:6px}
+  .grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr;gap:28px}
+  .step{padding:0 0 0 62px}
+  .step::before{position:absolute;left:0;top:0;margin:0}
+  .step::after{top:44px;bottom:-28px;left:21px;right:auto;width:2px;height:auto}
+  .hero{padding:56px 0 64px}
+  .role{padding:32px 24px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="#home" class="brand"><img src="685667950_851931460606770_7624076952502804008_n-removebg-preview.png" alt="">RentFlow</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks"><i class="fas fa-bars"></i></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="index.html?login=1" class="btn btn-primary btn-sm">Login</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>Rental management, made simple.</h1>
+      <p>Manage your rental property with ease. RentFlow brings tenants, billing, payments, and rental records together in one place, helping make everyday rental management easier and more convenient.</p>
+      <div class="hero-cta">
+        <a href="room-ads.html" class="btn btn-primary">Get Started</a>
+        <a href="#features" class="btn btn-ghost">Explore Features</a>
+      </div>
+    </div>
+    <div class="hero-mock" aria-hidden="true">
+      <div class="mock">
+        <div class="mock-side">
+          <span class="on"><i class="fas fa-table-columns"></i></span>
+          <i class="fas fa-users"></i>
+          <i class="fas fa-door-open"></i>
+          <i class="fas fa-file-invoice"></i>
+          <i class="fas fa-comments"></i>
+        </div>
+        <div class="mock-main">
+          <div class="mock-top"><span><i class="fas fa-receipt"></i>Payments</span><i class="fas fa-bell" style="color:#9db0c0;margin:0"></i></div>
+          <div class="mock-tabs"><span class="on">Pending</span><span>Approved</span><span>All</span></div>
+          <div class="mock-row"><div class="av"><i class="fas fa-user"></i></div><div class="ln"><b></b><i></i></div><span class="pill chk">Receipt submitted</span></div>
+          <div class="mock-row"><div class="av"><i class="fas fa-user"></i></div><div class="ln"><b style="width:45%"></b><i></i></div><span class="pill wait">Pending</span></div>
+          <div class="mock-row"><div class="av"><i class="fas fa-user"></i></div><div class="ln"><b style="width:62%"></b><i></i></div><span class="pill ok">Paid</span></div>
+          <div class="mock-note">Illustrative preview</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="about" id="about">
+  <div class="wrap">
+    <h2>Everything you need to manage rentals in one place.</h2>
+    <p>RentFlow is a rental management system designed to simplify the process of managing rental properties. It provides landlords with a convenient way to manage tenants, monitor billing, track payments, and organize rental information, while giving tenants access to their bills and payment submissions.</p>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Built for the way rentals actually run.</h2>
+      <p>Each part of RentFlow covers an everyday task, from keeping records to checking receipts.</p>
+    </div>
+    <div class="grid">
+      <article class="card"><div class="ico"><i class="fas fa-users"></i></div><h3>Tenant Management</h3><p>Keep tenant information organized and easily accessible.</p></article>
+      <article class="card"><div class="ico"><i class="fas fa-file-invoice-dollar"></i></div><h3>Billing Management</h3><p>Create, manage, and monitor tenant bills and payment due dates.</p></article>
+      <article class="card"><div class="ico"><i class="fas fa-receipt"></i></div><h3>Payment Tracking</h3><p>Track submitted payment receipts and monitor payment statuses.</p></article>
+      <article class="card"><div class="ico"><i class="fas fa-door-open"></i></div><h3>Rental Property Management</h3><p>Organize rental rooms and keep property details in one place.</p></article>
+      <article class="card"><div class="ico"><i class="fas fa-chart-line"></i></div><h3>Payment Overview</h3><p>Review recent payments, pending receipts, and rental income records.</p></article>
+      <article class="card"><div class="ico"><i class="fas fa-circle-question"></i></div><h3>Rental Assistance</h3><p>Get guidance on using the system and navigating rental management features.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head"><h2>How it works</h2></div>
+    <div class="steps">
+      <div class="step"><h3>Access Your Account</h3><p>Log in to your account and access features based on your role as a landlord or tenant.</p></div>
+      <div class="step"><h3>Manage Your Rental Activities</h3><p>Landlords can manage tenants, rooms, and billing, while tenants can view their bills and payment details.</p></div>
+      <div class="step"><h3>Submit and Monitor Payments</h3><p>Tenants can submit payment receipts for verification, while landlords review and update payment statuses.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="roles">
+  <div class="wrap">
+    <div class="role land">
+      <h2>Manage your property with confidence.</h2>
+      <p>Keep track of your tenants, rental rooms, billing, payment submissions, and income records through a centralized rental management system.</p>
+      <ul>
+        <li><i class="fas fa-check"></i>Tenants and rental rooms</li>
+        <li><i class="fas fa-check"></i>Billing and due dates</li>
+        <li><i class="fas fa-check"></i>Payment submissions and income records</li>
+      </ul>
+    </div>
+    <div class="role ten">
+      <h2>A simpler rental experience for tenants.</h2>
+      <p>View your bills, check payment details, and submit payment receipts without the hassle of keeping track of everything manually.</p>
+      <ul>
+        <li><i class="fas fa-check"></i>View your bills</li>
+        <li><i class="fas fa-check"></i>Check payment details</li>
+        <li><i class="fas fa-check"></i>Submit payment receipts</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-box">
+      <h2>Ready to make rental management easier?</h2>
+      <p>Get started with RentFlow and experience a more organized way to manage your rental activities.</p>
+      <a href="index.html?login=1" class="btn">Sign In to Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a href="#home" class="brand"><img src="685667950_851931460606770_7624076952502804008_n-removebg-preview.png" alt="">RentFlow</a>
+        <p>A rental management system for tenants, billing, payments, and rental records.</p>
+      </div>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="index.html?login=1">Login</a></li>
+      </ul>
+    </div>
+    <div class="copy">© <span id="yr">2026</span> RentFlow. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  var btn = document.getElementById('menuBtn'), links = document.getElementById('navLinks');
+  btn.addEventListener('click', function () {
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+    btn.firstElementChild.className = open ? 'fas fa-xmark' : 'fas fa-bars';
+  });
+  links.addEventListener('click', function (e) {
+    if (e.target.closest('a')) { links.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); btn.firstElementChild.className = 'fas fa-bars'; }
+  });
+  document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

@@ -18,6 +18,7 @@ import {
     query,
     orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const firebaseConfig = {
     apiKey:            "AIzaSyAGd7Aaiu_d-VIokG16gapCZOlpGheb9tY",
@@ -32,6 +33,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 const ROOMS_COLLECTION = "rooms";
+
+// ── Supabase setup ───────────────────────────────────────────────────────────
+// Use your project URL from Supabase and paste your anon key here.
+// Example: https://btnyktrrympxfhzlmvqp.supabase.co
+const SUPABASE_URL = "https://btnyktrrympxfhzlmvqp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0bnlrdHJyeW1weGZoemxtdnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNzk3ODIsImV4cCI6MjEwNjg1NTc4Mn0.2SBCPh5ioC6JBJVofJlJT8QcxKriYwb0vQDkLlOf2OQ";
+
+const supabase = SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== "PASTE_YOUR_SUPABASE_ANON_KEY_HERE"
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+    })
+    : null;
 
 // ── Photo localStorage helpers ───────────────────────────────────────────────
 // Photos are stored as base64 data URLs in localStorage under the key:
@@ -57,6 +70,46 @@ function loadPhotoLocally(roomId) {
 
 function deletePhotoLocally(roomId) {
     localStorage.removeItem(PHOTO_KEY_PREFIX + roomId);
+}
+
+async function uploadRoomImageToSupabase(file, roomId) {
+    if (!supabase) {
+        throw new Error("Supabase is not configured. Add your anon key to room-details.js.");
+    }
+
+    const bucketName = "room-images";
+    const safeName = `${Date.now()}-${roomId || "room"}-${file.name.replace(/[^a-zA-Z0-9_.-]/g, "-")}`;
+
+    const { error } = await supabase.storage
+        .from(bucketName)
+        .upload(safeName, file, {
+            cacheControl: "3600",
+            upsert: true,
+            contentType: file.type || "image/jpeg"
+        });
+
+    if (error) {
+        throw error;
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(safeName);
+    return data.publicUrl;
+}
+
+async function saveRoomPhoto(file, roomId) {
+    if (!file) return null;
+
+    try {
+        if (supabase) {
+            return await uploadRoomImageToSupabase(file, roomId);
+        }
+    } catch (err) {
+        console.warn("Supabase upload failed, using browser fallback instead:", err);
+    }
+
+    const base64 = await fileToBase64(file);
+    savePhotoLocally(roomId, base64);
+    return null;
 }
 
 /**
@@ -336,8 +389,8 @@ function generateRoomsList() {
         const roomItem = document.createElement('div');
         roomItem.className = 'room-item';
 
-        // Load photo from localStorage using the room's Firestore ID
-        const photoData = room.id ? loadPhotoLocally(room.id) : null;
+        // Prefer Supabase image URL, otherwise use localStorage fallback.
+        const photoData = room.photoUrl || (room.id ? loadPhotoLocally(room.id) : null);
         const photoHtml = photoData
             ? `<img src="${photoData}" alt="Room photo"
                     style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
@@ -453,9 +506,9 @@ function loadRoom(roomIndex) {
     setSelectValue(container, '.due-period-num',  room.duePeriodNum  || '1');
     setSelectValue(container, '.due-period-unit', room.duePeriodUnit || 'week');
 
-    // Load photo from localStorage (persisted across refreshes)
+    // Load photo from Supabase or localStorage (persisted across refreshes)
     if (room.id) {
-        const savedPhoto = loadPhotoLocally(room.id);
+        const savedPhoto = room.photoUrl || loadPhotoLocally(room.id);
         if (savedPhoto) setRoomPhotoPreviewUrl(savedPhoto);
     }
 
@@ -524,20 +577,28 @@ function setupRoomForm(roomIndex) {
                 duePeriodUnit: form.querySelector('.due-period-unit')?.value || 'week',
                 updatedAt:     new Date().toISOString(),
             };
-            // Note: photoUrl is NOT stored in Firestore — photos live in localStorage only.
 
             if (isAddingNewRoom) {
-                // 1. Create the Firestore document to get a stable ID
+                // 1. Create the Firestore document to get a stable ID.
                 data.createdAt = new Date().toISOString();
                 const newId    = await addRoomToFirestore(data);
 
-                // 2. If a photo was selected, convert to base64 and save locally
+                // 2. Upload to Supabase if configured; otherwise save locally.
                 if (pendingPhotoFile) {
-                    const base64 = await fileToBase64(pendingPhotoFile);
-                    const ok     = savePhotoLocally(newId, base64);
-                    if (!ok) {
-                        showSizeWarning(true);
-                        alert('Photo could not be saved — storage may be full. Try a smaller image.');
+                    try {
+                        const uploadedUrl = await saveRoomPhoto(pendingPhotoFile, newId);
+                        if (uploadedUrl) {
+                            data.photoUrl = uploadedUrl;
+                            await updateRoomInFirestore(newId, { photoUrl: uploadedUrl });
+                        }
+                    } catch (err) {
+                        console.warn('Photo save failed. Falling back to localStorage only.', err);
+                        const base64 = await fileToBase64(pendingPhotoFile);
+                        const ok     = savePhotoLocally(newId, base64);
+                        if (!ok) {
+                            showSizeWarning(true);
+                            alert('Photo could not be saved — storage may be full. Try a smaller image.');
+                        }
                     }
                 }
 
@@ -548,18 +609,26 @@ function setupRoomForm(roomIndex) {
 
             } else {
                 const firestoreId = rooms[roomIndex].id;
-                await updateRoomInFirestore(firestoreId, data);
 
-                // Save new photo to localStorage if one was chosen
                 if (pendingPhotoFile) {
-                    const base64 = await fileToBase64(pendingPhotoFile);
-                    const ok     = savePhotoLocally(firestoreId, base64);
-                    if (!ok) {
-                        showSizeWarning(true);
-                        alert('Photo could not be saved — storage may be full. Try a smaller image.');
+                    try {
+                        const uploadedUrl = await saveRoomPhoto(pendingPhotoFile, firestoreId);
+                        if (uploadedUrl) {
+                            data.photoUrl = uploadedUrl;
+                        }
+                    } catch (err) {
+                        console.warn('Photo save failed. Falling back to localStorage only.', err);
+                        const base64 = await fileToBase64(pendingPhotoFile);
+                        const ok     = savePhotoLocally(firestoreId, base64);
+                        if (!ok) {
+                            showSizeWarning(true);
+                            alert('Photo could not be saved — storage may be full. Try a smaller image.');
+                        }
                     }
                 }
-                // If no new photo was picked, the existing one stays in localStorage untouched.
+
+                await updateRoomInFirestore(firestoreId, data);
+                // If no new photo was picked, the existing one stays untouched.
 
                 rooms[roomIndex] = { ...rooms[roomIndex], ...data };
                 generateRoomsList();

@@ -15,13 +15,13 @@ A modern, responsive login page for your Rental Management System.
 
 ## Features
 
-✅ **Responsive Design** - Works on desktop, tablet, and mobile devices
-✅ **Email & Password Fields** - With proper validation
-✅ **Remember Me** - Saves email to localStorage for convenience
-✅ **Login & Register Buttons** - Professional styling
-✅ **Form Validation** - Client-side validation for email and password
-✅ **Smooth Animations** - Hover effects and transitions
-✅ **Modern UI** - Clean, professional design matching your mockup
+**Responsive Design** - Works on desktop, tablet, and mobile devices
+**Email & Password Fields** - With proper validation
+**Remember Me** - Saves email to localStorage for convenience
+**Login & Register Buttons** - Professional styling
+**Form Validation** - Client-side validation for email and password
+**Smooth Animations** - Hover effects and transitions
+**Modern UI** - Clean, professional design matching your mockup
 
 ## How to Use
 

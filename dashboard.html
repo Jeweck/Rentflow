@@ -28,17 +28,41 @@
         .user-profile-name { font-size: 13px; font-weight: 600; color: #333; }
         .user-profile-email { font-size: 11px; color: #888; }
 
-        /* Stat cards */
-        .stats-container { display: flex; flex-direction: column; gap: 14px; padding: 24px 24px 0; }
-        .stat-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e8e8e8; position: relative; overflow: hidden; }
-        .stat-card-revenue { background: linear-gradient(135deg, #2C96CD 0%, #1e7aab 100%); border-color: transparent; }
-        .stat-card-revenue .stat-label { color: rgba(255,255,255,0.75); }
-        .stat-card-revenue .stat-value { font-size: 38px; color: #fff; }
-        .stat-card-revenue .stat-info  { color: rgba(255,255,255,0.6); }
-        .stats-row-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-        .stat-label { font-size: 12px; color: #999; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-        .stat-value { font-size: 28px; font-weight: 700; color: #1a1a1a; line-height: 1; }
-        .stat-info  { font-size: 12px; color: #aaa; margin-top: 6px; }
+        /* Messages */
+        .messages-card { background: #fff; border-radius: 12px; border: 1px solid #d8eaf5; padding: 22px 24px; margin: 20px 24px 0; box-shadow: 0 3px 12px rgba(44,150,205,0.08); }
+        .notification-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .notification-modal-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+        .messages-subtitle { color: #777; font-size: 13px; margin: 0 0 16px; }
+        .notification-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+        .notification-tab { background: none; border: none; padding: 12px 16px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .notification-tab.active { color: #2C96CD; border-bottom-color: #2C96CD; }
+        .notification-tab-content { display: none; }
+        .notification-tab-content.active { display: block; }
+        .notification-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .notification-form-group { display: flex; flex-direction: column; gap: 6px; }
+        .notification-form-group:nth-child(n+3), .notification-send-btn { grid-column: 1 / -1; }
+        .notification-form-label { font-size: 12px; font-weight: 600; color: #666; }
+        .notification-form-input, .notification-form-select, .notification-form-textarea { padding: 10px 12px; font-size: 13px; border: 1.5px solid #e5e7eb; border-radius: 8px; background: #fff; color: #222; outline: none; transition: border 0.2s; font-family: inherit; }
+        .notification-form-input:focus, .notification-form-select:focus, .notification-form-textarea:focus { border-color: #2C96CD; }
+        .notification-form-textarea { resize: vertical; min-height: 100px; }
+        .notification-send-btn { background: #2C96CD; color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .notification-send-btn:hover { background: #1e7aab; }
+        .notification-send-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .notification-list { display: flex; flex-direction: column; gap: 12px; max-height: 420px; overflow-y: auto; }
+        .notification-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; transition: all 0.2s; }
+        .notification-item:hover { background: #f3f4f6; border-color: #2C96CD; }
+        .notification-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .notification-item-sender { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+        .notification-item-time { font-size: 11px; color: #999; }
+        .notification-item-purpose { display: inline-block; background: #2C96CD; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+        .notification-item-description { font-size: 12px; color: #666; line-height: 1.4; }
+        .notification-empty-state { text-align: center; padding: 30px 20px; color: #999; font-size: 13px; }
+        .notification-empty-state i { font-size: 30px; margin-bottom: 10px; display: block; color: #ddd; }
+        .notification-loading { text-align: center; padding: 20px; color: #999; font-size: 13px; }
+        @media (max-width: 640px) {
+            .notification-form { grid-template-columns: 1fr; }
+            .notification-form-group:nth-child(n+3), .notification-send-btn { grid-column: auto; }
+        }
 
         /* Requests */
         .requests-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; padding: 22px 24px; margin: 20px 24px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
@@ -87,54 +111,6 @@
         .req-empty i { font-size: 30px; display: block; margin-bottom: 10px; color: #ddd; }
         .req-loading { text-align: center; padding: 30px; color: #bbb; font-size: 13px; }
 
-        /* Payments table */
-        .table-card { background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; padding: 20px; margin: 20px 24px 24px; }
-        .table-card h3 { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; }
-        .payment-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .payment-table th { text-align: left; padding: 9px 12px; font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #f0f0f0; }
-        .payment-table td { padding: 12px; border-bottom: 1px solid #f5f5f5; color: #333; }
-        .payment-table tr:last-child td { border-bottom: none; }
-        .payment-table tbody tr:hover td { background: #fafafa; }
-        .status-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .paid    { background: #dcfce7; color: #16a34a; }
-        .pending { background: #fef3c7; color: #d97706; }
-        .overdue { background: #fee2e2; color: #dc2626; }
-        .table-loading { text-align: center; padding: 30px; color: #bbb; font-size: 13px; }
-
-        /* Notification Modal */
-        .notification-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; z-index: 500; }
-        .notification-modal.open { display: flex; }
-        .notification-modal-content { background: #fff; border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.15); }
-        .notification-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-        .notification-modal-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
-        .notification-close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
-        .notification-close-btn:hover { color: #333; }
-        .notification-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
-        .notification-tab { background: none; border: none; padding: 12px 16px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-        .notification-tab.active { color: #2C96CD; border-bottom-color: #2C96CD; }
-        .notification-tab-content { display: none; }
-        .notification-tab-content.active { display: block; }
-        .notification-form { display: flex; flex-direction: column; gap: 14px; }
-        .notification-form-group { display: flex; flex-direction: column; gap: 6px; }
-        .notification-form-label { font-size: 12px; font-weight: 600; color: #666; }
-        .notification-form-input, .notification-form-select, .notification-form-textarea { padding: 10px 12px; font-size: 13px; border: 1.5px solid #e5e7eb; border-radius: 8px; background: #fff; color: #222; outline: none; transition: border 0.2s; font-family: inherit; }
-        .notification-form-input:focus, .notification-form-select:focus, .notification-form-textarea:focus { border-color: #2C96CD; }
-        .notification-form-textarea { resize: vertical; min-height: 100px; }
-        .notification-send-btn { background: #2C96CD; color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .notification-send-btn:hover { background: #1e7aab; }
-        .notification-send-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .notification-list { display: flex; flex-direction: column; gap: 12px; }
-        .notification-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; transition: all 0.2s; }
-        .notification-item:hover { background: #f3f4f6; border-color: #2C96CD; }
-        .notification-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .notification-item-sender { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-        .notification-item-time { font-size: 11px; color: #999; }
-        .notification-item-purpose { display: inline-block; background: #2C96CD; color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
-        .notification-item-description { font-size: 12px; color: #666; line-height: 1.4; }
-        .notification-empty-state { text-align: center; padding: 30px 20px; color: #999; font-size: 13px; }
-        .notification-empty-state i { font-size: 30px; margin-bottom: 10px; display: block; color: #ddd; }
-        .notification-loading { text-align: center; padding: 20px; color: #999; font-size: 13px; }
-
         /* Toast */
         .toast { position: fixed; bottom: 30px; right: 30px; background: #1a1a1a; color: #fff; padding: 14px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
         .toast.show { transform: translateY(0); opacity: 1; }
@@ -149,8 +125,8 @@
 
     <main class="dashboard-content">
         <header class="dashboard-header">
-            <button class="notification-btn" id="notificationBtn">
-                <i class="fas fa-bell"></i>
+            <button class="notification-btn" id="notificationBtn" aria-label="Go to messages" title="Go to messages">
+                <i class="fas fa-comments"></i>
                 <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
             </button>
             <div class="user-profile">
@@ -164,31 +140,51 @@
 
         <div class="dashboard-body-content">
 
-            <!-- Stats -->
-            <div class="stats-container">
-                <div class="stat-card stat-card-revenue">
-                    <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value" id="statRevenue"><i class="fas fa-spinner fa-spin" style="font-size:22px;color:rgba(255,255,255,0.4);"></i></div>
-                    <div class="stat-info" id="statRevenueInfo">from paid receipts</div>
+            <section class="messages-card" id="messagesCard">
+                <div class="notification-modal-header">
+                    <h2 class="notification-modal-title"><i class="fas fa-comments" style="color:#2C96CD;margin-right:8px;"></i>Messages</h2>
                 </div>
-                <div class="stats-row-three">
-                    <div class="stat-card">
-                        <div class="stat-label">Active Tenants</div>
-                        <div class="stat-value" id="statActiveTenants"><i class="fas fa-spinner fa-spin" style="font-size:18px;color:#ddd;"></i></div>
-                        <div class="stat-info" id="statActiveTenantsInfo">currently active</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Vacant Units</div>
-                        <div class="stat-value" id="statVacant"><i class="fas fa-spinner fa-spin" style="font-size:18px;color:#ddd;"></i></div>
-                        <div class="stat-info" id="statVacantInfo">rooms without tenants</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Overdue Payments</div>
-                        <div class="stat-value" id="statOverdue"><i class="fas fa-spinner fa-spin" style="font-size:18px;color:#ddd;"></i></div>
-                        <div class="stat-info" id="statOverdueInfo">requires attention</div>
-                    </div>
+                <p class="messages-subtitle">Send updates to tenants or review messages in your inbox.</p>
+                <div class="notification-tabs">
+                    <button class="notification-tab active" data-tab="send"><i class="fas fa-paper-plane"></i> Send Message</button>
+                    <button class="notification-tab" data-tab="inbox"><i class="fas fa-inbox"></i> Inbox</button>
                 </div>
-            </div>
+                <div class="notification-tab-content active" id="sendTab">
+                    <form class="notification-form" id="notificationForm">
+                        <div class="notification-form-group">
+                            <label class="notification-form-label" for="recipientInput">Recipient Email</label>
+                            <input type="email" class="notification-form-input" id="recipientInput" placeholder="Enter recipient's email address" required>
+                        </div>
+                        <div class="notification-form-group">
+                            <label class="notification-form-label" for="recipientNameInput">Recipient Name</label>
+                            <input type="text" class="notification-form-input" id="recipientNameInput" placeholder="Enter recipient's name" required>
+                        </div>
+                        <div class="notification-form-group">
+                            <label class="notification-form-label" for="purposeSelect">Purpose</label>
+                            <select class="notification-form-select" id="purposeSelect" required>
+                                <option value="">Select purpose...</option>
+                                <option value="Billing Confirmation">Billing Confirmation</option>
+                                <option value="Payment Reminder">Payment Reminder</option>
+                                <option value="Maintenance Schedule">Maintenance Schedule</option>
+                                <option value="Announcement">Announcement</option>
+                                <option value="Warning Notice">Warning Notice</option>
+                            </select>
+                        </div>
+                        <div class="notification-form-group">
+                            <label class="notification-form-label" for="descriptionInput">Message</label>
+                            <textarea class="notification-form-textarea" id="descriptionInput" placeholder="Write your message here..." required></textarea>
+                        </div>
+                        <button type="submit" class="notification-send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+                <div class="notification-tab-content" id="inboxTab">
+                    <div class="notification-loading" id="inboxLoading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>
+                    <div class="notification-list" id="notificationList" style="display:none;"></div>
+                    <div class="notification-empty-state" id="inboxEmpty" style="display:none;"><i class="fas fa-inbox"></i><div>No messages yet</div></div>
+                </div>
+            </section>
 
             <!-- Move-Out / Transfer Requests -->
             <div class="requests-card">
@@ -210,68 +206,8 @@
                 <div class="req-empty" id="reqEmpty" style="display:none;"><i class="fas fa-clipboard-check"></i> No requests found.</div>
             </div>
 
-            <!-- Recent Receipts -->
-            <div class="table-card">
-                <h3>Recent Payments</h3>
-                <div class="table-loading" id="recentLoading"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
-                <table class="payment-table" id="recentTable" style="display:none;">
-                    <thead><tr><th>Date</th><th>Tenant Name</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
-                    <tbody id="recentTableBody"></tbody>
-                </table>
-                <div class="table-loading" id="recentEmpty" style="display:none;">No payments recorded yet.</div>
-            </div>
-
         </div>
     </main>
-</div>
-
-<!-- Notification Modal -->
-<div class="notification-modal" id="notificationModal">
-    <div class="notification-modal-content">
-        <div class="notification-modal-header">
-            <h2 class="notification-modal-title"><i class="fas fa-bell" style="color:#2C96CD;margin-right:8px;"></i>Messages</h2>
-            <button class="notification-close-btn" id="notificationCloseBtn">&times;</button>
-        </div>
-        <div class="notification-tabs">
-            <button class="notification-tab active" data-tab="send"><i class="fas fa-paper-plane"></i> Send Message</button>
-            <button class="notification-tab" data-tab="inbox"><i class="fas fa-inbox"></i> Inbox</button>
-        </div>
-        <div class="notification-tab-content active" id="sendTab">
-            <form class="notification-form" id="notificationForm">
-                <div class="notification-form-group">
-                    <label class="notification-form-label">Recipient Email</label>
-                    <input type="email" class="notification-form-input" id="recipientInput" placeholder="Enter recipient's email address" required>
-                </div>
-                <div class="notification-form-group">
-                    <label class="notification-form-label">Recipient Name</label>
-                    <input type="text" class="notification-form-input" id="recipientNameInput" placeholder="Enter recipient's name" required>
-                </div>
-                <div class="notification-form-group">
-                    <label class="notification-form-label">Purpose</label>
-                    <select class="notification-form-select" id="purposeSelect" required>
-                        <option value="">Select purpose...</option>
-                        <option value="Billing Confirmation">Billing Confirmation</option>
-                        <option value="Payment Reminder">Payment Reminder</option>
-                        <option value="Maintenance Schedule">Maintenance Schedule</option>
-                        <option value="Announcement">Announcement</option>
-                        <option value="Warning Notice">Warning Notice</option>
-                    </select>
-                </div>
-                <div class="notification-form-group">
-                    <label class="notification-form-label">Message</label>
-                    <textarea class="notification-form-textarea" id="descriptionInput" placeholder="Write your message here..." required></textarea>
-                </div>
-                <button type="submit" class="notification-send-btn" id="sendBtn">
-                    <i class="fas fa-paper-plane"></i> Send Message
-                </button>
-            </form>
-        </div>
-        <div class="notification-tab-content" id="inboxTab">
-            <div class="notification-loading" id="inboxLoading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>
-            <div class="notification-list" id="notificationList" style="display:none;"></div>
-            <div class="notification-empty-state" id="inboxEmpty" style="display:none;"><i class="fas fa-inbox"></i><div>No messages yet</div></div>
-        </div>
-    </div>
 </div>
 
 <!-- Toast -->
@@ -328,30 +264,6 @@ function loadUserProfile() {
         initials = ep.length >= 2 ? (ep[0][0] + ep[1][0]).toUpperCase() : eu.slice(0, 2).toUpperCase();
     } else { initials = (userData.name || 'U').slice(0, 2).toUpperCase(); }
     document.getElementById('userAvatar').textContent = initials;
-}
-
-async function loadDashboardStats() {
-    try {
-        const tenantsSnap = await db.collection('tenants').get();
-        let activeTenants = 0, overdueTenants = 0;
-        tenantsSnap.forEach(d => { const s = d.data().status; if (s==='Active') activeTenants++; if (s==='Overdue') overdueTenants++; });
-        const roomsSnap = await db.collection('rooms').get();
-        let totalRooms = 0, vacantRooms = 0;
-        roomsSnap.forEach(d => { totalRooms++; const t = (d.data().tenant||'').toString().trim(); if (!t||t.toLowerCase()==='vacant') vacantRooms++; });
-        const receiptsSnap = await db.collection('receipts').get();
-        let totalRevenue = 0, paidCount = 0;
-        receiptsSnap.forEach(d => { const r=d.data(); if (r.status==='paid') { totalRevenue+=parseFloat(r.amount)||0; paidCount++; } });
-        document.getElementById('statRevenue').textContent = '₱'+totalRevenue.toLocaleString('en-PH',{minimumFractionDigits:2});
-        document.getElementById('statRevenueInfo').textContent = paidCount+' paid receipt'+(paidCount!==1?'s':'')+' (all-time)';
-        document.getElementById('statActiveTenants').textContent = activeTenants;
-        document.getElementById('statActiveTenantsInfo').textContent = tenantsSnap.size+' total tenant'+(tenantsSnap.size!==1?'s':'');
-        document.getElementById('statVacant').textContent = vacantRooms;
-        document.getElementById('statVacantInfo').textContent = totalRooms+' total room'+(totalRooms!==1?'s':'');
-        document.getElementById('statOverdue').textContent = overdueTenants;
-        document.getElementById('statOverdueInfo').textContent = overdueTenants>0?'requires attention':'all payments on time';
-    } catch(err) {
-        ['statRevenue','statActiveTenants','statVacant','statOverdue'].forEach(id => document.getElementById(id).textContent='—');
-    }
 }
 
 let allRequests = [];
@@ -477,36 +389,10 @@ document.querySelectorAll('.req-filter-tab').forEach(tab => {
     });
 });
 
-async function loadRecentReceipts() {
-    const loading = document.getElementById('recentLoading');
-    const table   = document.getElementById('recentTable');
-    const empty   = document.getElementById('recentEmpty');
-    const tbody   = document.getElementById('recentTableBody');
-    try {
-        const snap = await db.collection('receipts').orderBy('createdAt','desc').limit(5).get();
-        loading.style.display = 'none';
-        if (snap.empty) { empty.style.display = 'block'; return; }
-        table.style.display = 'table'; tbody.innerHTML = '';
-        snap.forEach(d => {
-            const r = d.data();
-            const amount = parseFloat(r.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2});
-            const cls = r.status==='paid'?'paid':r.status==='overdue'?'overdue':'pending';
-            const lbl = r.status==='paid'?'PAID':r.status==='overdue'?'OVERDUE':'PENDING';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${r.date||'—'}</td><td>${r.name||'—'}</td><td>${r.description||'—'}</td><td>₱${amount}</td><td><span class="status-badge ${cls}">${lbl}</span></td>`;
-            tbody.appendChild(tr);
-        });
-    } catch(err) { loading.style.display='none'; empty.style.display='block'; }
-}
-
 document.getElementById('notificationBtn').addEventListener('click', () => {
-    document.getElementById('notificationModal').classList.add('open'); loadInboxMessages();
-});
-document.getElementById('notificationCloseBtn').addEventListener('click', () =>
-    document.getElementById('notificationModal').classList.remove('open'));
-document.getElementById('notificationModal').addEventListener('click', e => {
-    if (e.target===document.getElementById('notificationModal'))
-        document.getElementById('notificationModal').classList.remove('open');
+    const inboxTab = document.querySelector('.notification-tab[data-tab="inbox"]');
+    inboxTab.click();
+    document.getElementById('messagesCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 document.querySelectorAll('.notification-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -579,9 +465,8 @@ async function loadInboxMessages() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
-    loadDashboardStats();
     loadMoveOutRequests();
-    loadRecentReceipts();
+    loadInboxMessages();
 });
 </script>
 </body>

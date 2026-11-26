@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="685667950_851931460606770_7624076952502804008_n-removebg-preview.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Requests - Rental Management</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:#f0f2f5}
+.dashboard-header{display:flex;align-items:center;justify-content:flex-end;padding:14px 24px;background:#fff;border-bottom:1px solid #f0f0f0;gap:16px;position:fixed;top:0;left:64px;right:0;z-index:40}
+.dashboard-content{margin-top:60px;margin-left:64px}
+.user-profile{display:flex;align-items:center;gap:8px}
+.user-profile-info{display:flex;flex-direction:column}
+.user-profile-name{font-size:13px;font-weight:600;color:#333}
+.user-profile-email{font-size:11px;color:#888}
+.page{padding:28px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:22px;font-weight:700;color:#1a1a1a}
+.page-count{font-size:13px;color:#888;margin-left:10px;font-weight:400}
+.tabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:18px;flex-wrap:wrap}
+.tab{background:none;border:none;padding:9px 16px;font-size:12px;font-weight:600;color:#888;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:inherit}
+.tab.active{color:#2C96CD;border-bottom-color:#2C96CD}
+.tab .c{background:#e5e7eb;color:#888;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px}
+.tab.active .c{background:#dbeeff;color:#2C96CD}
+.list{display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;display:flex;overflow:hidden;animation:fadeIn .25s ease;transition:box-shadow .2s}
+.card:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card-img{width:190px;min-height:170px;object-fit:cover;background:#e8f5fd;flex-shrink:0}
+.card-img-ph{width:190px;background:#e8f5fd;color:#2C96CD;font-size:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-body{padding:16px 20px;flex:1;min-width:0}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:.06em;color:#aaa;text-transform:uppercase}
+.room-name{font-size:16px;font-weight:700;color:#1a1a1a;margin:2px 0}
+.room-price{font-size:14px;font-weight:700;color:#2C96CD}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.grid div span{display:block;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.04em}
+.grid div b{font-size:13px;color:#333;font-weight:600}
+.msg{background:#f0f7ff;border-left:3px solid #2C96CD;border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:#1e5f8a;margin-bottom:12px}
+.tenant-box{font-size:12px;color:#666;line-height:1.7;background:#f9fafb;border-radius:8px;padding:8px 12px;margin-top:10px}
+.badge{display:inline-flex;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.b-pending{background:#fef3c7;color:#d97706}.b-accepted{background:#dcfce7;color:#16a34a}
+.b-rejected{background:#fee2e2;color:#dc2626}.b-cancelled{background:#f3f4f6;color:#6b7280}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;transition:all .2s}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-ok{background:#dcfce7;color:#16a34a}.btn-ok:hover:not(:disabled){background:#16a34a;color:#fff}
+.btn-no{background:#fee2e2;color:#dc2626}.btn-no:hover:not(:disabled){background:#dc2626;color:#fff}
+.btn-primary{background:#2C96CD;color:#fff;font-size:14px;padding:10px 20px}.btn-primary:hover:not(:disabled){background:#1e7aab}
+.btn-grey{background:#f3f4f6;color:#555;font-size:14px;padding:10px 20px}.btn-grey:hover{background:#e5e7eb}
+.empty,.loading{text-align:center;padding:60px 20px;color:#bbb;font-size:14px}
+.empty i{font-size:44px;display:block;margin-bottom:12px;color:#ddd}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;z-index:500;padding:16px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal h3{margin:0 0 16px;font-size:18px;color:#1a1a1a}
+.room-sum{display:flex;gap:14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:6px}
+.room-sum img,.room-sum .ph{width:96px;height:80px;border-radius:8px;object-fit:cover;background:#e8f5fd;color:#2C96CD;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.room-sum .t{font-size:12px;color:#666;line-height:1.6}
+.room-sum .t b{font-size:14px;color:#1a1a1a;display:block}
+.chip{display:inline-block;background:#e8f5fd;color:#2C96CD;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;margin:2px 3px 0 0}
+.modal label{font-size:12px;color:#777;display:block;margin:13px 0 5px;font-weight:600}
+.modal input,.modal select,.modal textarea{width:100%;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;font-family:inherit;transition:border .2s}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:#2C96CD}
+.modal input[readonly]{background:#f3f4f6;color:#777}
+.modal textarea{resize:vertical;min-height:80px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;margin-top:22px}.modal-actions .btn{flex:1;justify-content:center}
+.toast{position:fixed;bottom:30px;right:30px;background:#1a1a1a;color:#fff;padding:13px 20px;border-radius:10px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:9999;transform:translateY(80px);opacity:0;transition:all .35s}
+.toast.show{transform:none;opacity:1}.toast.success i{color:#22c55e}.toast.error i{color:#ef4444}
+@keyframes spin{to{transform:rotate(360deg)}}.fa-spin{animation:spin .8s linear infinite}
+@media(max-width:700px){.card{flex-direction:column}.card-img,.card-img-ph{width:100%;height:150px;min-height:0}.page{padding:16px}.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="dashboard-body">
+<div class="dashboard-container">
+<main class="dashboard-content">
+  <header class="dashboard-header">
+    <div class="user-profile">
+      <div id="userAvatar" style="width:32px;height:32px;border-radius:50%;background:#2C96CD;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff"></div>
+      <div class="user-profile-info"><div class="user-profile-name" id="uName">User</div><div class="user-profile-email" id="uEmail"></div></div>
+    </div>
+  </header>
+  <div class="page">
+    <div class="page-head"><div class="page-title"><span id="pageTitle">Booking Requests</span><span class="page-count" id="pageCount"></span></div></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="loading" id="loading"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+    <div class="list" id="list"></div>
+    <div class="empty" id="empty" style="display:none"><i class="fas fa-calendar-check"></i><span id="emptyTxt">No booking requests yet.</span></div>
+  </div>
+</main>
+</div>
+
+<!-- Booking form (tenant) -->
+<div class="overlay" id="formOverlay"><div class="modal">
+  <h3><i class="fas fa-calendar-plus" style="color:#2C96CD;margin-right:8px"></i>Request to Book</h3>
+  <div class="room-sum" id="roomSum"></div>
+  <label>Your Name</label><input id="fName" readonly>
+  <label>Email</label><input id="fEmail" readonly>
+  <label>Contact Number *</label><input id="fPhone" type="tel" placeholder="e.g. 09171234567">
+  <div class="row2">
+    <div><label>Move-in Date *</label><input id="fMove" type="date"></div>
+    <div><label>Length of Stay *</label>
+      <select id="fDur"><option value="">Select…</option><option>1 month</option><option>3 months</option><option>6 months</option><option>12 months</option><option>More than 12 months</option></select></div>
+  </div>
+  <label>Number of Occupants *</label><input id="fOcc" type="number" min="1" max="20" value="1">
+  <label>Message to Landlord *</label><textarea id="fMsg" placeholder="Tell the landlord about yourself…"></textarea>
+  <div class="modal-actions"><button class="btn btn-grey" id="fCancel">Cancel</button><button class="btn btn-primary" id="fSend">Send Booking Request</button></div>
+</div></div>
+
+<!-- Confirm -->
+<div class="overlay" id="confOverlay" style="z-index:600"><div class="modal" style="max-width:380px">
+  <h3 id="confTitle">Confirm</h3><p id="confText" style="font-size:14px;color:#555;margin:0"></p>
+  <div class="modal-actions"><button class="btn btn-grey" id="confNo">No</button><button class="btn btn-primary" id="confYes">Yes</button></div>
+</div></div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="sidebar.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyAGd7Aaiu_d-VIokG16gapCZOlpGheb9tY",authDomain:"rentalmangemnetsystem.firebaseapp.com",projectId:"rentalmangemnetsystem",storageBucket:"rentalmangemnetsystem.firebasestorage.app",messagingSenderId:"143952534193",appId:"1:143952534193:web:1a0dc97e5e0f10fde16090"});
+const db = firebase.firestore(), FV = firebase.firestore.FieldValue;
+const $ = id => document.getElementById(id);
+const user = JSON.parse(localStorage.getItem('userData') || 'null') || {};
+const roomParam = new URLSearchParams(location.search).get('room');
+if (!user.uid) {
+  const returnTo = roomParam ? `booking.html?room=${encodeURIComponent(roomParam)}` : '';
+  location.replace(returnTo ? `index.html?returnTo=${encodeURIComponent(returnTo)}` : 'index.html');
+}
+const isTenant = user && user.role === 'tenant';
+let bookings = [], filter = 'all', currentRoom = null, busy = false;
+
+/* ---------- helpers ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pick = (o, ...k) => { for (const x of k) if (o[x] !== undefined && o[x] !== null && o[x] !== '') return o[x]; return ''; };
+const peso = n => { const v = parseFloat(String(n).replace(/[^0-9.]/g, '')); return isNaN(v) ? '—' : '₱' + v.toLocaleString('en-PH') + '/month'; };
+const fmtDate = v => { if (!v) return '—'; const d = v.toDate ? v.toDate() : new Date(v); return isNaN(d) ? v : d.toLocaleDateString('en-PH', {year:'numeric', month:'long', day:'numeric'}); };
+function toast(m, t = 'success') { const e = $('toast'); $('toastMsg').textContent = m; e.className = 'toast ' + t; e.querySelector('i').className = t === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 3500); }
+function confirmBox(title, text) {
+  return new Promise(res => {
+    $('confTitle').textContent = title; $('confText').textContent = text; $('confOverlay').classList.add('open');
+    const done = v => { $('confOverlay').classList.remove('open'); $('confYes').onclick = $('confNo').onclick = null; res(v); };
+    $('confYes').onclick = () => done(true); $('confNo').onclick = () => done(false);
+  });
+}
+function notify(toEmail, toName, purpose, text) {
+  if (!toEmail) return Promise.resolve();
+  return db.collection('messages').add({ sender: user.name || 'Rentflow', senderEmail: user.email || '', senderRole: user.role || '',
+    recipient: toEmail, recipientName: toName || '', purpose, description: text, timestamp: FV.serverTimestamp(), read: false });
+}
+
+/* ---------- header ---------- */
+$('uName').textContent = user.username || user.name || 'User'; $('uEmail').textContent = user.email || '';
+$('userAvatar').textContent = (user.name || user.email || 'U').split(/[\s@]/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase();
+$('pageTitle').textContent = isTenant ? 'My Booking Requests' : 'Booking Requests';
+$('tabs').innerHTML = ['all','pending','accepted','rejected','cancelled'].map(s => `<button class="tab ${s==='all'?'active':''}" data-f="${s}">${s[0].toUpperCase()+s.slice(1)}<span class="c" id="c-${s}">0</span></button>`).join('');
+$('tabs').onclick = e => { const b = e.target.closest('.tab'); if (!b) return; filter = b.dataset.f; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === b)); render(); };
+
+/* ---------- real-time listener ---------- */
+function listen() {
+  let q = db.collection('bookings');
+  if (isTenant) q = q.where('tenantUid', '==', user.uid);
+  q.onSnapshot(snap => {
+    let rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Landlord: only rooms they own (rooms without a landlord field are treated as theirs)
+    if (!isTenant) rows = rows.filter(b => !b.landlordUid && !b.landlordEmail || b.landlordUid === user.uid || (b.landlordEmail || '').toLowerCase() === (user.email || '').toLowerCase());
+    rows.sort((a, b) => (b.createdAt?.toMillis?.() || Date.now()) - (a.createdAt?.toMillis?.() || Date.now()));
+    bookings = rows; $('loading').style.display = 'none'; render();
+  }, err => { console.error(err); $('loading').style.display = 'none'; toast('Failed to load bookings: ' + err.message, 'error'); });
+}
+
+/* ---------- render ---------- */
+function render() {
+  ['all','pending','accepted','rejected','cancelled'].forEach(s => $('c-' + s).textContent = s === 'all' ? bookings.length : bookings.filter(b => b.status === s).length);
+  $('pageCount').textContent = bookings.length + ' request' + (bookings.length !== 1 ? 's' : '');
+  const rows = filter === 'all' ? bookings : bookings.filter(b => b.status === filter);
+  $('empty').style.display = rows.length ? 'none' : 'block';
+  $('emptyTxt').textContent = isTenant ? 'No booking requests yet. Use “Request to Book” on a room advertisement.' : 'No booking requests found.';
+  $('list').innerHTML = rows.map(b => {
+    const img = b.roomImage ? `<img class="card-img" src="${esc(b.roomImage)}" alt="Room">` : `<div class="card-img-ph"><i class="fas fa-bed"></i></div>`;
+    const pending = b.status === 'pending';
+    return `<div class="card" data-id="${b.id}">${img}<div class="card-body">
+      <div class="card-top"><div><div class="eyebrow">Booking Request</div><div class="room-name">${esc(b.roomName || 'Room')}</div><div class="room-price">${peso(b.roomPrice)}</div></div>
+      <span class="badge b-${esc(b.status)}">${esc(b.status)}</span></div>
+      <div class="grid">
+        <div><span>Move-in</span><b>${fmtDate(b.moveInDate)}</b></div>
+        <div><span>Duration</span><b>${esc(b.duration)}</b></div>
+        ${isTenant ? '' : `<div><span>Occupants</span><b>${esc(b.occupants)}</b></div>`}
+        <div><span>Requested</span><b>${fmtDate(b.createdAt)}</b></div>
+      </div>
+      ${isTenant ? '' : `<div class="tenant-box"><i class="fas fa-user" style="color:#2C96CD"></i> <b>${esc(b.tenantName)}</b><br><i class="fas fa-envelope"></i> ${esc(b.tenantEmail)} &nbsp; <i class="fas fa-phone"></i> ${esc(b.tenantPhone)}</div>`}
+      ${b.message && !isTenant ? `<div class="msg" style="margin-top:10px"><b>Tenant's message:</b> ${esc(b.message)}</div>` : ''}
+      ${pending ? `<div class="actions" style="margin-top:12px">${isTenant
+        ? `<button class="btn btn-no" onclick="cancelBooking('${b.id}')"><i class="fas fa-ban"></i> Cancel Request</button>`
+        : `<button class="btn btn-ok" onclick="decide('${b.id}','accepted')"><i class="fas fa-check"></i> Accept</button><button class="btn btn-no" onclick="decide('${b.id}','rejected')"><i class="fas fa-times"></i> Reject</button>`}</div>` : ''}
+    </div></div>`;
+  }).join('');
+}
+
+/* ---------- tenant: booking form (opened via booking.html?room=ROOM_ID) ---------- */
+async function openForm(roomId) {
+  try {
+    const snap = await db.collection('rooms').doc(roomId).get();
+    if (!snap.exists) return toast('Room not found.', 'error');
+    const r = snap.data();
+    if (r.bookingStatus === 'booked' || r.available === false) return toast('This room has already been booked.', 'error');
+    const am = pick(r, 'amenities', 'amenity');
+    const chips = (Array.isArray(am) ? am : String(am).split(',')).map(s => String(s).trim()).filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join('');
+    currentRoom = { id: roomId,
+      name: pick(r, 'roomName', 'name', 'title', 'roomNumber') || 'Room', price: pick(r, 'price', 'rent', 'monthlyRent', 'rate'),
+      image: pick(r, 'photo', 'image', 'imageUrl', 'photoUrl', 'roomImage'), landlordUid: pick(r, 'landlordUid', 'landlordId', 'ownerId', 'ownerUid'),
+      landlordEmail: pick(r, 'landlordEmail', 'ownerEmail'), landlordName: pick(r, 'landlordName', 'ownerName') };
+    const c = currentRoom;
+    $('roomSum').innerHTML = `${c.image ? `<img src="${esc(c.image)}" alt="">` : '<div class="ph"><i class="fas fa-bed"></i></div>'}
+      <div class="t"><b>${esc(c.name)}</b>${peso(c.price)}<br>${pick(r, 'location', 'address') ? '<i class="fas fa-location-dot"></i> ' + esc(pick(r, 'location', 'address')) + '<br>' : ''}${c.landlordName ? 'Owner: ' + esc(c.landlordName) + '<br>' : ''}${chips}</div>`;
+    $('fName').value = user.name || ''; $('fEmail').value = user.email || '';
+    $('fMove').min = new Date().toISOString().split('T')[0];
+    $('formOverlay').classList.add('open');
+  } catch (e) { toast('Could not load room: ' + e.message, 'error'); }
+}
+$('fCancel').onclick = () => { $('formOverlay').classList.remove('open'); history.replaceState(null, '', 'booking.html'); };
+$('fSend').onclick = async () => {
+  if (busy) return;
+  const phone = $('fPhone').value.trim(), move = $('fMove').value, dur = $('fDur').value, occ = parseInt($('fOcc').value, 10), msg = $('fMsg').value.trim();
+  if (!phone || !move || !dur || !msg || !(occ >= 1)) return toast('Please fill in all required fields.', 'error');
+  if (!/^[0-9+\-\s()]{7,15}$/.test(phone)) return toast('Please enter a valid contact number.', 'error');
+  if (move < $('fMove').min) return toast('Move-in date cannot be in the past.', 'error');
+  if (!await confirmBox('Send Request', 'Are you sure you want to send this booking request to the landlord?')) return;
+  busy = true; $('fSend').disabled = true; $('fSend').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+  try {
+    const dup = await db.collection('bookings').where('tenantUid', '==', user.uid).where('roomId', '==', currentRoom.id).where('status', '==', 'pending').get();
+    if (!dup.empty) throw new Error('You already have a pending request for this room.');
+    await db.collection('bookings').add({
+      roomId: currentRoom.id, roomName: currentRoom.name, roomPrice: currentRoom.price, roomImage: currentRoom.image,
+      tenantUid: user.uid, tenantName: user.name || '', tenantEmail: user.email || '', tenantPhone: phone,
+      landlordUid: currentRoom.landlordUid || '', landlordEmail: currentRoom.landlordEmail || '',
+      moveInDate: move, duration: dur, occupants: occ, message: msg, status: 'pending',
+      createdAt: FV.serverTimestamp(), updatedAt: FV.serverTimestamp() });
+    await notify(currentRoom.landlordEmail, currentRoom.landlordName, 'New Booking Request', `New booking request for ${currentRoom.name} from ${user.name}.`);
+    $('formOverlay').classList.remove('open'); history.replaceState(null, '', 'booking.html');
+    $('fPhone').value = $('fMsg').value = ''; toast('Booking request submitted! Status: Pending.');
+  } catch (e) { toast(e.message, 'error'); }
+  busy = false; $('fSend').disabled = false; $('fSend').textContent = 'Send Booking Request';
+};
+
+/* ---------- tenant: cancel ---------- */
+async function cancelBooking(id) {
+  if (busy || !await confirmBox('Cancel Request', 'Cancel this booking request?')) return;
+  busy = true;
+  try {
+    const ref = db.collection('bookings').doc(id);
+    await db.runTransaction(async t => {
+      const s = await t.get(ref);
+      if (!s.exists || s.data().status !== 'pending') throw new Error('Only pending requests can be cancelled.');
+      t.update(ref, { status: 'cancelled', updatedAt: FV.serverTimestamp() });
+    });
+    toast('Booking request cancelled.');
+  } catch (e) { toast(e.message, 'error'); }
+  busy = false;
+}
+
+/* ---------- landlord: accept / reject ---------- */
+async function decide(id, status) {
+  if (busy) return;
+  const ok = await confirmBox(status === 'accepted' ? 'Accept Booking' : 'Reject Booking',
+    status === 'accepted' ? 'Accept this booking request?' : 'Are you sure you want to reject this booking request?');
+  if (!ok) return;
+  busy = true; document.querySelectorAll('.actions .btn').forEach(b => b.disabled = true);
+  const b = bookings.find(x => x.id === id), bRef = db.collection('bookings').doc(id);
+  try {
+    await db.runTransaction(async t => {
+      const bs = await t.get(bRef);
+      if (!bs.exists || bs.data().status !== 'pending') throw new Error('This request is no longer pending.');
+      if (status === 'accepted') {
+        const rRef = db.collection('rooms').doc(bs.data().roomId), rs = await t.get(rRef);
+        if (!rs.exists) throw new Error('Room no longer exists.');
+        const r = rs.data();
+        if (r.bookingStatus === 'booked' || r.available === false) throw new Error('This room has already been booked.');
+        t.update(rRef, { bookingStatus: 'booked', available: false, bookedBookingId: id, bookedTenantUid: bs.data().tenantUid, updatedAt: FV.serverTimestamp() });
+      }
+      t.update(bRef, { status, updatedAt: FV.serverTimestamp() });
+    });
+    await notify(b.tenantEmail, b.tenantName, status === 'accepted' ? 'Booking Accepted' : 'Booking Rejected', `Your booking request for ${b.roomName} has been ${status}.`);
+    toast(status === 'accepted' ? 'Booking request accepted successfully.' : 'Booking request rejected.');
+  } catch (e) { toast(e.message, 'error'); }
+  busy = false; render();
+}
+
+/* ---------- init ---------- */
+if (user.uid) {
+  listen();
+  if (isTenant && roomParam) openForm(roomParam);
+}
+</script>
+</body>
+</html>

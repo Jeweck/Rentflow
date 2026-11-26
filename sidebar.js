@@ -1,5 +1,11 @@
 (function () {
 
+  try {
+    document.documentElement.dataset.theme = localStorage.getItem('rms_theme') === 'dark' ? 'dark' : 'light';
+  } catch (error) {
+    console.error('Unable to load the saved theme preference.', error);
+  }
+
   // Load Font Awesome
   if (!document.querySelector('link[href*="font-awesome"]')) {
     const fa = document.createElement('link');
@@ -25,6 +31,14 @@
     .sidebar-dashboard:hover {
       width: 220px;
       box-shadow: 6px 0 24px rgba(0,0,0,0.2);
+    }
+    .sidebar-toggle {
+      width: 64px; min-width: 64px; height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      border: 0; padding: 0; background: transparent; cursor: pointer;
+    }
+    .sidebar-toggle:focus-visible {
+      outline: 2px solid #5bbfed; outline-offset: -4px;
     }
     .sidebar-top {
       padding: 10px 0; display: flex; align-items: center;
@@ -125,7 +139,15 @@
     .logout-btn:hover { background: rgba(239,68,68,0.15); color: #ff6b6b; transform: translateX(2px); }
     .logout-btn:hover .logout-icon-wrap i { color: #ff6b6b; }
     .dashboard-content { margin-left: 64px !important; flex: 1; min-width: 0; }
-    .dashboard-header { left: 64px !important; width: calc(100vw - 64px) !important; }
+    .dashboard-header {
+      left: var(--sidebar-w, 64px) !important;
+      right: 0 !important;
+      width: auto !important;
+      height: 60px !important;
+      padding: 14px 24px !important;
+      box-sizing: border-box !important;
+      border-bottom: 0 !important;
+    }
 
     @media (max-width: 900px) {
       .dashboard-content {
@@ -136,7 +158,8 @@
       }
       .dashboard-header {
         left: 64px !important;
-        width: calc(100vw - 64px) !important;
+        right: 0 !important;
+        width: auto !important;
         padding: 10px 12px !important;
       }
       .sidebar-dashboard {
@@ -150,6 +173,17 @@
       .sidebar-dashboard:hover .sidebar-logo-text,
       .sidebar-dashboard:hover .logout-btn .nav-label {
         opacity: 0 !important;
+      }
+      .sidebar-dashboard.is-expanded,
+      .sidebar-dashboard.is-expanded:hover {
+        width: 220px !important;
+        box-shadow: 6px 0 24px rgba(0,0,0,0.2) !important;
+      }
+      .sidebar-dashboard.is-expanded .nav-label,
+      .sidebar-dashboard.is-expanded .sidebar-logo-text,
+      .sidebar-dashboard.is-expanded .logout-btn .nav-label {
+        display: inline !important;
+        opacity: 1 !important;
       }
       .nav-btn,
       .logout-btn {
@@ -188,7 +222,134 @@
       .nav-tooltip {
         display: none !important;
       }
+      .sidebar-dashboard.is-expanded .nav-btn,
+      .sidebar-dashboard.is-expanded .logout-btn {
+        justify-content: flex-start !important;
+      }
+      .sidebar-dashboard.is-expanded .nav-icon-wrap,
+      .sidebar-dashboard.is-expanded .logout-icon-wrap {
+        width: 48px !important;
+        min-width: 48px !important;
+      }
+      .sidebar-dashboard.is-expanded .nav-label,
+      .sidebar-dashboard.is-expanded .logout-btn .nav-label {
+        display: inline !important;
+      }
     }
+
+      html[data-theme="dark"] {
+        color-scheme: dark;
+        background: #111827;
+      }
+      html[data-theme="dark"] body,
+      html[data-theme="dark"] .dashboard-content,
+      html[data-theme="dark"] .main-dashboard,
+      html[data-theme="dark"] .page-body,
+      html[data-theme="dark"] .page,
+      html[data-theme="dark"] .dashboard-body {
+        background-color: #111827 !important;
+        color: #e5e7eb;
+      }
+      html[data-theme="dark"] .dashboard-header,
+      html[data-theme="dark"] .panel,
+      html[data-theme="dark"] .card,
+      html[data-theme="dark"] .stat-card,
+      html[data-theme="dark"] .messages-card,
+      html[data-theme="dark"] .requests-card,
+      html[data-theme="dark"] .settings-card,
+      html[data-theme="dark"] .tenants-table-wrap,
+      html[data-theme="dark"] .modal,
+      html[data-theme="dark"] .s-modal,
+      html[data-theme="dark"] .t-modal {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+        color: #e5e7eb;
+      }
+      html[data-theme="dark"] .req-item,
+      html[data-theme="dark"] .notification-item,
+      html[data-theme="dark"] .inbox-item,
+      html[data-theme="dark"] .history-item,
+      html[data-theme="dark"] .tenant-box,
+      html[data-theme="dark"] .tenant-item,
+      html[data-theme="dark"] .stat,
+      html[data-theme="dark"] .room-sum,
+      html[data-theme="dark"] .tenant-data-notice,
+      html[data-theme="dark"] .settings-card-header {
+        background-color: #273449 !important;
+        border-color: #374151 !important;
+      }
+      html[data-theme="dark"] .settings-page-title,
+      html[data-theme="dark"] .settings-card-header-title,
+      html[data-theme="dark"] .page-title,
+      html[data-theme="dark"] .section-title,
+      html[data-theme="dark"] .requests-card-title,
+      html[data-theme="dark"] .notification-modal-title,
+      html[data-theme="dark"] .req-item-name,
+      html[data-theme="dark"] .room-name,
+      html[data-theme="dark"] .user-profile-name,
+      html[data-theme="dark"] .stat-neutral,
+      html[data-theme="dark"] .tenant-name-text,
+      html[data-theme="dark"] .s-modal-title,
+      html[data-theme="dark"] .modal h3,
+      html[data-theme="dark"] .settings-card-body,
+      html[data-theme="dark"] .card-body,
+      html[data-theme="dark"] .dashboard-content h1,
+      html[data-theme="dark"] .dashboard-content h2,
+      html[data-theme="dark"] .dashboard-content h3,
+      html[data-theme="dark"] .dashboard-content strong {
+        color: #f3f4f6 !important;
+      }
+      html[data-theme="dark"] .notification-btn,
+      html[data-theme="dark"] .notif-label,
+      html[data-theme="dark"] .req-item-details,
+      html[data-theme="dark"] .req-item-details strong,
+      html[data-theme="dark"] .notification-item-description,
+      html[data-theme="dark"] .inbox-item-desc,
+      html[data-theme="dark"] .history-item-details,
+      html[data-theme="dark"] .history-item-details strong,
+      html[data-theme="dark"] .grid div b,
+      html[data-theme="dark"] .bill-desc,
+      html[data-theme="dark"] .t-name,
+      html[data-theme="dark"] .t-sub,
+      html[data-theme="dark"] .s-form-label,
+      html[data-theme="dark"] .s-modal-label,
+      html[data-theme="dark"] .appearance-description,
+      html[data-theme="dark"] .user-profile-email {
+        color: #d1d5db !important;
+      }
+      html[data-theme="dark"] .dashboard-content input:not([type="checkbox"]):not([type="radio"]),
+      html[data-theme="dark"] .dashboard-content select,
+      html[data-theme="dark"] .dashboard-content textarea,
+      html[data-theme="dark"] .modal input,
+      html[data-theme="dark"] .modal select,
+      html[data-theme="dark"] .modal textarea,
+      html[data-theme="dark"] .s-modal-input {
+        background-color: #111827 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+      }
+      html[data-theme="dark"] .dashboard-content input::placeholder,
+      html[data-theme="dark"] .dashboard-content textarea::placeholder {
+        color: #9ca3af;
+      }
+      html[data-theme="dark"] .tenants-table th {
+        background-color: #273449 !important;
+        border-color: #374151 !important;
+        color: #9ca3af !important;
+      }
+      html[data-theme="dark"] .tenants-table td {
+        border-color: #374151 !important;
+        color: #d1d5db !important;
+      }
+      html[data-theme="dark"] .tenants-table tbody tr:hover td,
+      html[data-theme="dark"] .notification-item:hover,
+      html[data-theme="dark"] .tenant-item:hover {
+        background-color: #334155 !important;
+      }
+      html[data-theme="dark"] .settings-card-header,
+      html[data-theme="dark"] .settings-card-header-title {
+        color: #f3f4f6 !important;
+      }
   `;
   document.head.appendChild(style);
 
@@ -214,9 +375,9 @@
     aside.className = 'sidebar-dashboard';
     aside.innerHTML = `
       <div class="sidebar-top">
-        <div class="sidebar-logo-wrap">
+        <button class="sidebar-toggle" type="button" aria-label="Expand navigation" aria-expanded="false">
           <img class="sidebar-logo-img" src="685667950_851931460606770_7624076952502804008_n-removebg-preview.png" alt="Logo">
-        </div>
+        </button>
         <span class="sidebar-logo-text">Rentflow</span>
       </div>
       <nav class="nav-menu">
@@ -234,6 +395,11 @@
           <span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span>
           <span class="nav-label">Room Details</span>
           <span class="nav-tooltip">Room Details</span>
+        </button>
+        <button class="nav-btn ${active('booking.html')}" data-href="booking.html">
+          <span class="nav-icon-wrap"><i class="fa-solid fa-calendar-check"></i></span>
+          <span class="nav-label">Bookings</span>
+          <span class="nav-tooltip">Bookings</span>
         </button>
         <button class="nav-btn ${active('payment.html')}" data-href="payment.html">
           <span class="nav-icon-wrap"><i class="fa-solid fa-credit-card"></i></span>
@@ -255,6 +421,31 @@
     `;
 
     document.body.insertBefore(aside, document.body.firstChild);
+
+    const sidebarToggle = aside.querySelector('.sidebar-toggle');
+    const mobileSidebar = window.matchMedia('(max-width: 900px)');
+    const setSidebarExpanded = (expanded) => {
+      aside.classList.toggle('is-expanded', expanded);
+      sidebarToggle.setAttribute('aria-expanded', String(expanded));
+      sidebarToggle.setAttribute('aria-label', expanded ? 'Collapse navigation' : 'Expand navigation');
+    };
+
+    sidebarToggle.addEventListener('click', () => {
+      if (mobileSidebar.matches) {
+        setSidebarExpanded(!aside.classList.contains('is-expanded'));
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (mobileSidebar.matches && !aside.contains(event.target)) {
+        setSidebarExpanded(false);
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setSidebarExpanded(false);
+    });
+    mobileSidebar.addEventListener('change', (event) => {
+      if (!event.matches) setSidebarExpanded(false);
+    });
 
     aside.querySelectorAll('.nav-btn[data-href]').forEach(btn => {
       btn.addEventListener('click', () => { window.location.href = btn.dataset.href; });

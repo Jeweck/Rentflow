@@ -20,7 +20,7 @@ function loadUserProfile() {
     if (emailEl) emailEl.textContent = userData.email || 'user@email.com';
 
     if (avatarEl) {
-        // Initials from FULL NAME for avatar (e.g. Jerick Ubaldo → JU)
+        // Initials from FULL NAME for avatar 
         const nameParts = (userData.name || '').trim().split(' ').filter(Boolean);
         let initials = '';
         if (nameParts.length >= 2) {

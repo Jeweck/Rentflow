@@ -1,777 +1,633 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"> 
-    <link rel="icon" type="image/png" href="685667950_851931460606770_7624076952502804008_n-removebg-preview.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment and Billing - Rental Management</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+<link rel="icon" type="image/png" href="685667950_851931460606770_7624076952502804008_n-removebg-preview.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment and Billing - Rental Management</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:0}
+.dashboard-header{display:flex;align-items:center;justify-content:flex-end;padding:14px 24px;background:#fff;border-bottom:1px solid #f0f0f0;gap:16px;width:100vw;position:fixed;top:0;left:0;right:0;z-index:40}
+.sidebar-dashboard{z-index:50}
+.main-dashboard{margin-top:60px;min-height:calc(100vh - 60px);background:#f0f2f5}
+.user-profile{display:flex;align-items:center;gap:8px}
+.user-profile-info{display:flex;flex-direction:column;min-width:0}
+.user-profile-name{font-size:13px;font-weight:600;color:#333;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-profile-email{font-size:11px;color:#888;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-        .dashboard-header {
-            display: flex; align-items: center; justify-content: flex-end;
-            padding: 14px 24px; background: #fff; border-bottom: 1px solid #f0f0f0;
-            gap: 16px; width: 100vw; box-sizing: border-box;
-            position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-        }
-        .sidebar-dashboard { z-index: 50; }
-        .main-dashboard { margin-top: 60px; min-height: calc(100vh - 60px); background: #f0f2f5; }
-        .user-profile { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .user-profile-info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
-        .user-profile-name { font-size: 13px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
-        .user-profile-email { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+.pay-body{padding:24px 28px;display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
+.pay-body.single{grid-template-columns:1fr}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px}
+.tenant-panel{overflow:hidden;position:sticky;top:84px}
+.panel-head{padding:16px 18px;border-bottom:1px solid #f0f0f0;font-size:15px;font-weight:700;color:#1a1a1a}
+html[data-theme="dark"] .panel-head{color:#f3f4f6}
+.search{width:calc(100% - 24px);margin:12px;padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.search:focus{border-color:#2C96CD}
+.tenant-list{max-height:calc(100vh - 230px);overflow-y:auto;padding:0 8px 8px}
+.tenant-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:none;background:none;border-radius:8px;cursor:pointer;text-align:left;font-family:inherit;transition:background .15s}
+.tenant-item:hover{background:#f5f9fc}
+.tenant-item.active{background:#e8f5fd}
+.avatar{width:36px;height:36px;border-radius:50%;background:#2C96CD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.tenant-item.active .avatar{background:#1e7aab}
+.t-info{flex:1;min-width:0}
+.t-name{font-size:13px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-sub{font-size:11px;color:#888}
+.t-due{background:#fef3c7;color:#d97706;font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px}
 
-        .payment-page-body { padding: 28px 28px 100px; width: 100%; }
-        .payment-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-        .payment-page-title-group { display: flex; align-items: center; gap: 12px; }
-        .payment-page-title { font-size: 22px; font-weight: 700; color: #1a1a1a; }
-        .receipts-count-badge { font-size: 13px; font-weight: 400; color: #888; }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
+.detail-empty{padding:90px 20px;text-align:center;color:#bbb}
+.detail-empty i{font-size:46px;margin-bottom:12px;display:block;color:#ccc}
+.detail-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #f0f0f0;flex-wrap:wrap}
+.detail-title{display:flex;align-items:center;gap:12px}
+.detail-title h2{margin:0;font-size:18px;color:#1a1a1a}
+.detail-title span{font-size:12px;color:#888}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 22px}
+.stat{background:#f9fafb;border-radius:10px;padding:12px 14px}
+.stat-label{font-size:11px;color:#888;font-weight:600}
+.stat-val{font-size:18px;font-weight:700;color:#1a1a1a;margin-top:2px}
+.stat-val.paid{color:#16a34a}.stat-val.pending{color:#d97706}
+.bills{padding:0 22px 22px;display:flex;flex-direction:column;gap:10px}
+.bill{border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.bill-left{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+.bill-icon{width:40px;height:40px;border-radius:10px;background:#e8f5fd;color:#2C96CD;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bill-desc{font-size:14px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bill-meta{font-size:12px;color:#888;margin-top:2px}
+.bill-right{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.bill-amount{font-size:16px;font-weight:700}
+.badge{font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600}
+.badge-paid{background:#dcfce7;color:#16a34a}.badge-pending{background:#fef3c7;color:#d97706}
+.no-bills{text-align:center;padding:50px 20px;color:#bbb;font-size:14px}
+.no-bills i{display:block;font-size:38px;margin-bottom:10px}
 
-        .hdr-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; font-family: inherit; }
-        .hdr-btn-outline { background: #fff; color: #2C96CD; border: 1.5px solid #2C96CD; }
-        .hdr-btn-outline:hover { background: #f0f7ff; }
-        .submitted-badge { background: #ef4444; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 2px; }
+.action-menu{position:relative}
+.menu-btn{background:none;border:1px solid #e8e8e8;cursor:pointer;color:#888;font-size:13px;padding:6px 10px;border-radius:7px}
+.menu-btn:hover{background:#f0f8fd;color:#2C96CD;border-color:#2C96CD}
+.dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:10;min-width:150px;overflow:hidden}
+.dropdown-menu.show{display:block}
+.menu-item{width:100%;padding:9px 14px;background:none;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:#333;font-family:inherit}
+.menu-item:hover{background:#f9fafb}
+.menu-item.danger{color:#ef4444}.menu-item.danger:hover{background:#fef2f2}
 
-        .empty-state-wrap { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; }
-        .empty-state-wrap i { font-size: 52px; margin-bottom: 14px; }
-        .empty-state-wrap p { font-size: 15px; color: #bbb; margin: 0; }
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:background .15s}
+.btn-primary{background:#2C96CD;color:#fff}.btn-primary:hover{background:#1e7aab}
+.btn-outline{background:#fff;color:#2C96CD;border:1.5px solid #2C96CD}.btn-outline:hover{background:#f0f7ff}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.badge-count{background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.header-actions{position:fixed;bottom:32px;right:32px;z-index:50;display:flex;gap:10px}
 
-        .loading-wrap { display: flex; align-items: center; justify-content: center; padding: 60px 20px; color: #aaa; font-size: 14px; gap: 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .fa-spin { animation: spin 0.8s linear infinite; }
-
-        .receipts-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-
-        .receipt-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; width: 100%; animation: fadeIn 0.25s ease; transition: box-shadow 0.2s; }
-        .receipt-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-        @keyframes fadeIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
-
-        .receipt-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
-        .receipt-icon { width: 44px; height: 44px; border-radius: 10px; background: #e8f5fd; color: #2C96CD; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-        .receipt-info { flex: 1; min-width: 0; }
-        .receipt-desc { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .receipt-meta { font-size: 12px; color: #888; }
-        .receipt-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
-        .receipt-amount { font-size: 17px; font-weight: 700; color: #1a1a1a; }
-        .receipt-badge { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-        .badge-paid    { background: #dcfce7; color: #16a34a; }
-        .badge-pending { background: #fef3c7; color: #d97706; }
-
-        .action-menu { position: relative; }
-        .menu-btn { background: none; border: 1px solid #e8e8e8; cursor: pointer; color: #888; font-size: 13px; padding: 6px 10px; border-radius: 7px; transition: all 0.15s; }
-        .menu-btn:hover { background: #f0f8fd; color: #2C96CD; border-color: #2C96CD; }
-        .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 10; min-width: 120px; overflow: hidden; }
-        .dropdown-menu.show { display: block; }
-        .menu-item { width: 100%; padding: 9px 14px; background: none; border: none; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; color: #333; transition: background 0.15s; }
-        .menu-item:hover { background: #f9fafb; }
-        .delete-btn { color: #ef4444; }
-        .delete-btn:hover { background: #fef2f2; }
-        .hidden-for-tenant { display: none !important; }
-
-        .floating-btn-container { position: fixed; bottom: 32px; right: 32px; z-index: 50; }
-        .floating-btn { background: #2C96CD; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 8px rgba(44,150,205,0.25); transition: background 0.15s; }
-        .floating-btn:hover { background: #1e7aab; }
-
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; z-index: 200; }
-        .modal-overlay.open { display: flex; }
-
-        .modal { background: #fff; border-radius: 16px; padding: 28px; width: 400px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
-        .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1a1a1a; }
-        .modal label { font-size: 12px; color: #777; display: block; margin-bottom: 5px; margin-top: 14px; font-weight: 600; }
-        .modal input, .modal select { width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: #222; outline: none; transition: border 0.2s; font-family: inherit; }
-        .modal input:focus, .modal select:focus { border-color: #2C96CD; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
-        .modal-actions button { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: background 0.2s; font-family: inherit; }
-        .btn-cancel { background: #f3f4f6; color: #555; }
-        .btn-cancel:hover { background: #e5e7eb; }
-        .btn-save { background: #2C96CD; color: #fff; }
-        .btn-save:hover { background: #1e7aa8; }
-        .btn-save:disabled { background: #a0c8e0; cursor: not-allowed; }
-
-        .upload-modal { background: #fff; border-radius: 16px; padding: 28px; width: 440px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
-        .upload-modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1a1a1a; }
-        .upload-modal label { font-size: 12px; color: #777; display: block; margin-bottom: 5px; margin-top: 14px; font-weight: 600; }
-        .upload-modal input[type="text"], .upload-modal textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: #222; outline: none; transition: border 0.2s; font-family: inherit; }
-        .upload-modal input[type="text"]:focus, .upload-modal textarea:focus { border-color: #2C96CD; }
-        .upload-modal textarea { resize: vertical; min-height: 70px; }
-
-        .drop-zone { border: 2px dashed #c8d8e8; border-radius: 12px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #fafcff; position: relative; }
-        .drop-zone:hover, .drop-zone.dragover { border-color: #2C96CD; background: #f0f7ff; }
-        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .drop-zone i { font-size: 36px; color: #c8d8e8; margin-bottom: 10px; display: block; transition: color .2s; }
-        .drop-zone:hover i, .drop-zone.dragover i { color: #2C96CD; }
-        .drop-zone p { font-size: 13px; color: #999; margin: 0; }
-        .drop-zone p strong { color: #2C96CD; }
-
-        .preview-wrap { margin-top: 14px; display: none; border-radius: 10px; overflow: hidden; position: relative; }
-        .preview-wrap img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
-        .preview-remove { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-
-        .upload-progress { margin-top: 14px; display: none; }
-        .progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 8px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #2C96CD, #1e7aab); border-radius: 99px; transition: width 0.3s; width: 0%; }
-        .progress-label { font-size: 12px; color: #888; margin-top: 6px; text-align: center; }
-
-        .view-submitted-modal { background: #fff; border-radius: 16px; padding: 28px; width: 560px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); max-height: 85vh; overflow-y: auto; position: relative; }
-        .view-submitted-modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1a1a1a; }
-        .modal-close-x { position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 22px; cursor: pointer; color: #999; line-height: 1; }
-        .modal-close-x:hover { color: #333; }
-
-        .submitted-list { display: flex; flex-direction: column; gap: 14px; }
-        .submitted-card { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
-        .submitted-img { width: 100%; max-height: 200px; object-fit: cover; display: block; cursor: zoom-in; transition: opacity .2s; }
-        .submitted-img:hover { opacity: .9; }
-        .submitted-info { padding: 12px 16px; background: #fafafa; }
-        .submitted-tenant { font-size: 13px; font-weight: 700; color: #1a1a1a; }
-        .submitted-note { font-size: 12px; color: #666; margin-top: 3px; }
-        .submitted-date { font-size: 11px; color: #aaa; margin-top: 4px; }
-        .submitted-dismiss { font-size: 11px; color: #ef4444; background: none; border: none; cursor: pointer; padding: 0; margin-top: 6px; }
-        .submitted-dismiss:hover { text-decoration: underline; }
-        .no-submissions { text-align: center; padding: 50px 20px; color: #bbb; }
-        .no-submissions i { font-size: 40px; margin-bottom: 12px; display: block; }
-
-        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); align-items: center; justify-content: center; z-index: 400; cursor: zoom-out; }
-        .lightbox.open { display: flex; }
-        .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 0 40px rgba(0,0,0,.5); }
-
-        .landlord-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; z-index: 200; }
-        .landlord-modal.open { display: flex; }
-        .landlord-card { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 400px; box-shadow: 0 8px 40px rgba(0,0,0,0.15); position: relative; }
-        .landlord-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: #1e1b4b; text-align: center; }
-        .payment-method-btn { width: 100%; padding: 14px; margin-bottom: 12px; border: 2px solid #e5e7eb; background: #fff; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-        .payment-method-btn:hover { border-color: #2C96CD; background: #f0f7ff; }
-        .payment-method-btn.active { border-color: #2C96CD; background: #2C96CD; color: #fff; }
-        .landlord-details { background: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 16px; display: none; }
-        .landlord-details.show { display: block; }
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: #888; font-weight: 600; }
-        .detail-value { color: #333; font-weight: 600; }
-        .copy-btn { background: #2C96CD; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; cursor: pointer; margin-top: 12px; width: 100%; }
-        .copy-btn:hover { background: #1e7aab; }
-        .close-landlord-btn { position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
-        .close-landlord-btn:hover { color: #333; }
-
-        .toast { position: fixed; bottom: 90px; right: 32px; background: #333; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 300; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.success { background: #16a34a; }
-        .toast.error   { background: #ef4444; }
-    </style>
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);align-items:center;justify-content:center;z-index:200;padding:16px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto;position:relative}
+.modal.wide{max-width:560px}
+.modal h3{font-size:18px;margin:0 0 16px;color:#1a1a1a}
+.modal label{font-size:12px;color:#777;display:block;margin:14px 0 5px;font-weight:600}
+.modal input,.modal select,.modal textarea{width:100%;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:#2C96CD}
+.modal-actions{display:flex;gap:10px;margin-top:22px}
+.modal-actions .btn{flex:1;justify-content:center;padding:10px}
+.btn-cancel{background:#f3f4f6;color:#555}.btn-cancel:hover{background:#e5e7eb}
+.close-x{position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#999}
+.sub-card{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.sub-card img{width:100%;max-height:200px;object-fit:cover;display:block;cursor:zoom-in}
+.sub-info{padding:12px 16px;background:#fafafa;font-size:12px;color:#666}
+.sub-info b{display:block;font-size:13px;color:#1a1a1a}
+.link-danger{background:none;border:none;color:#ef4444;font-size:11px;cursor:pointer;padding:0;margin-top:6px}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:400;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px}
+.pm-btn{width:100%;padding:13px;margin-bottom:10px;border:2px solid #e5e7eb;background:#fff;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;font-family:inherit}
+.pm-btn.active{border-color:#2C96CD;background:#2C96CD;color:#fff}
+.pm-details{display:none;background:#f9fafb;padding:14px;border-radius:8px;margin-top:12px}
+.pm-details.show{display:block}
+.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e7eb;font-size:13px}
+.row:last-of-type{border-bottom:none}.row span:first-child{color:#888;font-weight:600}
+.drop{border:2px dashed #c8d8e8;border-radius:12px;padding:28px 16px;text-align:center;color:#999;font-size:13px;position:relative;background:#fafcff}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.loading{display:flex;justify-content:center;gap:10px;padding:50px;color:#aaa;font-size:14px}
+.toast{position:fixed;bottom:90px;right:32px;background:#333;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:500;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:none}.toast.success{background:#16a34a}.toast.error{background:#ef4444}
+.badge-partial{background:#e0f2fe;color:#0369a1}.badge-rej{background:#fee2e2;color:#dc2626}
+.sub-actions{display:flex;gap:8px;margin-top:10px}
+.btn-ok{background:#16a34a;color:#fff}.btn-ok:hover{background:#15803d}
+.btn-no{background:#fff;color:#ef4444;border:1.5px solid #ef4444}.btn-no:hover{background:#fef2f2}
+@media(max-width:860px){.pay-body{grid-template-columns:1fr;padding:16px 16px 90px}.tenant-panel{position:static}.tenant-list{max-height:240px}.summary{grid-template-columns:1fr}.bill{flex-wrap:wrap}}
+</style>
 </head>
 <body>
 <div class="dashboard-container">
-
-    <header class="dashboard-header">
-        <div class="user-profile">
-            <div id="userAvatar" style="width:32px;height:32px;border-radius:50%;background:#2C96CD;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></div>
-            <div class="user-profile-info">
-                <div class="user-profile-name" id="userProfileName">User Name</div>
-                <div class="user-profile-email" id="userProfileEmail">user@email.com</div>
-            </div>
-        </div>
-    </header>
-
-    <div class="main-dashboard">
-        <div class="payment-page-body">
-            <div class="payment-page-header">
-                <div class="payment-page-title-group">
-                    <div class="payment-page-title">Receipts</div>
-                    <span class="receipts-count-badge" id="receiptsCountBadge"></span>
-                </div>
-                <div class="header-actions" id="headerActions"></div>
-            </div>
-            <div class="loading-wrap" id="loading-wrap"><i class="fas fa-spinner fa-spin"></i> Loading receipts…</div>
-            <div class="empty-state-wrap" id="empty-wrap">
-                <i class="fas fa-receipt"></i>
-                <p>No receipts yet. Click <strong>+ Add Receipt</strong> to get started.</p>
-            </div>
-            <div class="receipts-list" id="receipts-list"></div>
-        </div>
+  <header class="dashboard-header">
+    <div class="user-profile">
+      <div id="userAvatar" class="avatar" style="width:32px;height:32px"></div>
+      <div class="user-profile-info">
+        <div class="user-profile-name" id="userProfileName">User Name</div>
+        <div class="user-profile-email" id="userProfileEmail"></div>
+      </div>
     </div>
+  </header>
 
-    <div class="floating-btn-container" id="floatingContainer">
-        <button class="floating-btn" id="add-receipt-btn">
-            <i class="fas fa-plus"></i> Add Receipt
-        </button>
+  <div class="main-dashboard">
+    <div class="pay-body" id="payBody">
+      <aside class="panel tenant-panel" id="tenantPanel">
+        <div class="panel-head">Tenants</div>
+        <input class="search" id="tenantSearch" placeholder="Search tenants…">
+        <div class="tenant-list" id="tenantList"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading…</div></div>
+      </aside>
+      <section class="panel" id="detailPanel"></section>
     </div>
+  </div>
+  <div class="header-actions" id="actions"></div>
 </div>
 
-<!-- Add/Edit Receipt Modal -->
-<div class="modal-overlay" id="modal">
-    <div class="modal">
-        <h3 id="modal-title">Add Receipt</h3>
-        <label>Tenant Name</label>
-        <input type="text" id="tenant-name" placeholder="e.g. Juan Dela Cruz">
-        <label>Amount (₱)</label>
-        <input type="number" id="amount" placeholder="e.g. 5000">
-        <label>Description</label>
-        <input type="text" id="description" placeholder="e.g. Monthly Rent - June">
-        <label>Status</label>
-        <select id="status">
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-        </select>
-        <div class="modal-actions">
-            <button class="btn-cancel" id="cancel-btn">Cancel</button>
-            <button class="btn-save" id="save-btn">Save</button>
-        </div>
-    </div>
-</div>
+<!-- Add/Edit billing -->
+<div class="overlay" id="billModal"><div class="modal">
+  <h3 id="billTitle">Add billing</h3>
+  <p id="billTenant" style="margin:0;font-size:13px;color:#888"></p>
+  <label>Description</label><input id="bDesc" placeholder="e.g. Monthly rent - June">
+  <label>Amount (₱)</label><input type="number" id="bAmount" placeholder="e.g. 5000">
+  <label>Due date</label><input type="date" id="bDue">
+  <label>Status</label>
+  <select id="bStatus"><option value="pending">Pending</option><option value="paid">Paid</option></select>
+  <div class="modal-actions"><button class="btn btn-cancel" id="bCancel">Cancel</button><button class="btn btn-primary" id="bSave">Save billing</button></div>
+</div></div>
 
-<!-- Upload Receipt Modal (Tenant only) -->
-<div class="modal-overlay" id="uploadOverlay">
-    <div class="upload-modal">
-        <h3><i class="fas fa-cloud-upload-alt" style="color:#2C96CD;margin-right:8px"></i>Upload Receipt</h3>
-        <div class="drop-zone" id="dropZone">
-            <input type="file" id="fileInput" accept="image/*">
-            <i class="fas fa-image"></i>
-            <p><strong>Click or drag</strong> an image here</p>
-            <p style="margin-top:4px;font-size:11px">JPG, PNG, WEBP supported</p>
-        </div>
-        <div class="preview-wrap" id="previewWrap">
-            <img id="previewImg" src="" alt="Preview">
-            <button class="preview-remove" id="removeImg" title="Remove"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="upload-progress" id="uploadProgress">
-            <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
-            <div class="progress-label" id="progressLabel">Uploading to cloud…</div>
-        </div>
-        <label>Your Name</label>
-        <input type="text" id="uploaderName" placeholder="e.g. Juan Dela Cruz">
-        <label>Note (optional)</label>
-        <textarea id="uploadNote" placeholder="e.g. Rent for June 2025"></textarea>
-        <div class="modal-actions">
-            <button class="btn-cancel" id="cancelUploadBtn">Cancel</button>
-            <button class="btn-save" id="submitUploadBtn">Submit</button>
-        </div>
-    </div>
-</div>
+<!-- Upload receipt (tenant) -->
+<div class="overlay" id="uploadModal"><div class="modal">
+  <h3><i class="fas fa-cloud-upload-alt" style="color:#2C96CD"></i> Upload receipt</h3>
+  <div class="drop" id="drop"><input type="file" id="file" accept="image/*"><span id="dropText"><b style="color:#2C96CD">Click or drag</b> an image here</span></div>
+  <label>Pay toward</label><select id="uBill"></select>
+  <label>Amount paid (₱)</label><input type="number" id="uAmount" placeholder="e.g. 5000">
+  <label>Your name</label><input id="uName">
+  <label>Note (optional)</label><textarea id="uNote" rows="2" placeholder="e.g. Rent for June"></textarea>
+  <div class="modal-actions"><button class="btn btn-cancel" id="uCancel">Cancel</button><button class="btn btn-primary" id="uSubmit">Submit receipt</button></div>
+</div></div>
 
-<!-- View Submitted Modal (Landlord only) -->
-<div class="modal-overlay" id="viewOverlay">
-    <div class="view-submitted-modal">
-        <button class="modal-close-x" id="closeViewModal">&times;</button>
-        <h3><i class="fas fa-images" style="color:#2C96CD;margin-right:8px"></i>Submitted Receipts</h3>
-        <div class="submitted-list" id="submittedList"></div>
-    </div>
-</div>
+<!-- Submitted receipts (landlord) -->
+<div class="overlay" id="viewModal"><div class="modal wide">
+  <button class="close-x" id="viewClose">&times;</button>
+  <h3><i class="fas fa-images" style="color:#2C96CD"></i> Submitted receipts</h3>
+  <div id="subList"></div>
+</div></div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox">
-    <img id="lightboxImg" src="" alt="Full receipt">
-</div>
+<div class="lightbox" id="lightbox"><img id="lightboxImg" alt="Full receipt"></div>
 
-<!-- Landlord Payment Details Modal (Tenant only) -->
-<div class="landlord-modal" id="landlordModal">
-    <div class="landlord-card">
-        <button class="close-landlord-btn" id="closeLandlordModal">&times;</button>
-        <h3>Payment Methods</h3>
-        <button class="payment-method-btn active" onclick="selectPaymentMethod(event,'gcash')">
-            <i class="fas fa-mobile-alt"></i> GCash
-        </button>
-        <button class="payment-method-btn" onclick="selectPaymentMethod(event,'banktransfer')">
-            <i class="fas fa-university"></i> Bank Transfer
-        </button>
-        <div class="landlord-details show" id="gcashDetails">
-            <div class="detail-row"><span class="detail-label">Landlord Name:</span><span class="detail-value" id="gcashName">Maria Santos</span></div>
-            <div class="detail-row"><span class="detail-label">GCash Number:</span><span class="detail-value" id="gcashNumber">09171234567</span></div>
-            <button class="copy-btn" onclick="copyToClipboard('gcashNumber')">Copy Number</button>
-        </div>
-        <div class="landlord-details" id="bankDetails">
-            <div class="detail-row"><span class="detail-label">Landlord Name:</span><span class="detail-value" id="bankName">Maria Santos</span></div>
-            <div class="detail-row"><span class="detail-label">Bank Name:</span><span class="detail-value" id="bankBankName">BPI</span></div>
-            <div class="detail-row"><span class="detail-label">Account Number:</span><span class="detail-value" id="bankAccount">1234567890</span></div>
-            <button class="copy-btn" onclick="copyToClipboard('bankAccount')">Copy Account Number</button>
-        </div>
-    </div>
-</div>
+<!-- Pay now (tenant) -->
+<div class="overlay" id="payModal"><div class="modal">
+  <button class="close-x" id="payClose">&times;</button>
+  <h3 style="text-align:center">Payment methods</h3>
+  <button class="pm-btn active" data-m="gcash"><i class="fas fa-mobile-alt"></i> GCash</button>
+  <button class="pm-btn" data-m="bank"><i class="fas fa-university"></i> Bank Transfer</button>
+  <div class="pm-details show" id="pm-gcash">
+    <div class="row"><span>Landlord name</span><span>Maria Santos</span></div>
+    <div class="row"><span>GCash number</span><span id="gcashNum">09171234567</span></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" data-copy="gcashNum">Copy number</button>
+  </div>
+  <div class="pm-details" id="pm-bank">
+    <div class="row"><span>Landlord name</span><span>Maria Santos</span></div>
+    <div class="row"><span>Bank</span><span>BPI</span></div>
+    <div class="row"><span>Account number</span><span id="bankNum">1234567890</span></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" data-copy="bankNum">Copy account number</button>
+  </div>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  STEP 1: Replace with your Cloudinary credentials           ║
-// ║  Sign up free at cloudinary.com                             ║
-// ╚══════════════════════════════════════════════════════════════╝
-const CLOUDINARY_CLOUD_NAME    = 'dvxwsj8j2';    // e.g. 'dxyz123abc'
-const CLOUDINARY_UPLOAD_PRESET = 'Rentflow_Reciepts';   // e.g. 'rental_receipts'
+const CLOUD='dvxwsj8j2', PRESET='Rentflow_Reciepts';
+firebase.initializeApp({
+  apiKey:"AIzaSyAGd7Aaiu_d-VIokG16gapCZOlpGheb9tY",
+  authDomain:"rentalmangemnetsystem.firebaseapp.com",
+  projectId:"rentalmangemnetsystem",
+  storageBucket:"rentalmangemnetsystem.firebasestorage.app",
+  messagingSenderId:"143952534193",
+  appId:"1:143952534193:web:1a0dc97e5e0f10fde16090"
+});
+const db=firebase.firestore();
+const tenantsCol=db.collection('tenants'), billsCol=db.collection('receipts'), subsCol=db.collection('submittedReceipts');
 
-// ── Firebase ───────────────────────────────────────────────────
-const firebaseConfig = {
-    apiKey:            "AIzaSyAGd7Aaiu_d-VIokG16gapCZOlpGheb9tY",
-    authDomain:        "rentalmangemnetsystem.firebaseapp.com",
-    projectId:         "rentalmangemnetsystem",
-    storageBucket:     "rentalmangemnetsystem.firebasestorage.app",
-    messagingSenderId: "143952534193",
-    appId:             "1:143952534193:web:1a0dc97e5e0f10fde16090"
+let role='landlord', me={}, tenants=[], tenantDirectory=[], bills=[], selectedId=null, editingId=null, upFile=null, mySubs=[], subs=[], tenantIdentityMatched=true;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
+const tenantNameKey=t=>norm(tName(t)).replace(/\s+/g,'');
+const peso=n=>'₱'+(parseFloat(n)||0).toLocaleString('en-PH',{minimumFractionDigits:2});
+const initials=n=>{const p=String(n||'?').trim().split(/\s+/);return ((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()};
+const tName=t=>String([t.firstName,t.lastName].filter(Boolean).join(' ').trim()||t.name||t.fullName||t.tenantName||'Unnamed tenant');
+function toast(m,t=''){const e=$('toast');e.textContent=m;e.className='toast show '+t;setTimeout(()=>e.className='toast',3200)}
+
+const sameTenantName=(a,b)=>tenantNameKey(a)===tenantNameKey(b);
+const uniqueTenantName=(tenant,directory=tenantDirectory)=>directory.filter(t=>sameTenantName(t,tenant)).length===1;
+const belongsToTenant=(record,tenant,directory=tenantDirectory)=>{
+  if(record.tenantId)return record.tenantId===tenant.id;
+  return uniqueTenantName(tenant,directory)&&tenantNameKey({name:record.name})===tenantNameKey(tenant);
 };
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const db             = firebase.firestore();
-const receiptsCol    = db.collection('receipts');
-const submissionsCol = db.collection('submittedReceipts');
+const billsFor=t=>bills.filter(b=>belongsToTenant(b,t));
+const unpaid=b=>String(b.status||'').toLowerCase()!=='paid'&&Math.max(0,(parseFloat(b.amount)||0)-paidOf(b))>0.005;
+const dueCount=t=>billsFor(t).filter(unpaid).length;
+const selected=()=>tenants.find(t=>t.id===selectedId);
 
-// ── State ──────────────────────────────────────────────────────
-let userRole     = 'landlord';
-let editingId    = null;
-let uploadedFile = null; // actual File object, NOT base64
-
-// ── DOM refs ───────────────────────────────────────────────────
-const modal         = document.getElementById('modal');
-const addBtn        = document.getElementById('add-receipt-btn');
-const cancelBtn     = document.getElementById('cancel-btn');
-const saveBtn       = document.getElementById('save-btn');
-const list          = document.getElementById('receipts-list');
-const emptyWrap     = document.getElementById('empty-wrap');
-const loadingWrap   = document.getElementById('loading-wrap');
-const uploadOverlay = document.getElementById('uploadOverlay');
-const viewOverlay   = document.getElementById('viewOverlay');
-const lightbox      = document.getElementById('lightbox');
-const landlordModal = document.getElementById('landlordModal');
-const dropZone      = document.getElementById('dropZone');
-const fileInput     = document.getElementById('fileInput');
-const previewWrap   = document.getElementById('previewWrap');
-const previewImg    = document.getElementById('previewImg');
-
-// ── Toast ──────────────────────────────────────────────────────
-function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show ' + type;
-    setTimeout(() => t.className = 'toast', 3500);
+const paidOf=b=>String(b.status||'').toLowerCase()==='paid'?(parseFloat(b.amount)||0):(parseFloat(b.paidAmount)||0);
+const badgeHtml=b=>String(b.status||'').toLowerCase()==='paid'?'<span class="badge badge-paid">Paid</span>':paidOf(b)>0?'<span class="badge badge-partial">Partial</span>':'<span class="badge badge-pending">Pending</span>';
+const subBadge=s=>({accepted:'<span class="badge badge-paid">Accepted</span>',rejected:'<span class="badge badge-rej">Rejected</span>'}[s.status]||'<span class="badge badge-pending">Awaiting review</span>');
+function mySubsHtml(){
+  if(!mySubs.length)return '';
+  return '<div style="padding:0 22px 22px"><div style="font-size:13px;font-weight:700;margin-bottom:8px">Your submitted receipts</div><div class="bills" style="padding:0">'+mySubs.map(x=>`<div class="bill"><div class="bill-left"><div class="bill-icon"><i class="fas fa-image"></i></div><div style="min-width:0"><div class="bill-desc">${x.amount?peso(x.amount):'Receipt'}</div><div class="bill-meta">${esc(x.date||'')}${x.status==='rejected'&&x.reason?' · Reason: '+esc(x.reason):''}</div></div></div>${subBadge(x)}</div>`).join('')+'</div></div>';
 }
 
-// ── Count badge ────────────────────────────────────────────────
-function updateCountBadge() {
-    const count = list.children.length;
-    const badge = document.getElementById('receiptsCountBadge');
-    if (badge) badge.textContent = count + ' receipt' + (count !== 1 ? 's' : '');
+function renderTenants(){
+  const q=norm($('tenantSearch').value);
+  const rows=tenants.filter(t=>norm([tName(t),t.room,t.roomNumber,t.email].filter(Boolean).join(' ')).includes(q));
+  $('tenantList').innerHTML=rows.length?rows.map(t=>{
+    const d=dueCount(t);
+    return `<button class="tenant-item ${t.id===selectedId?'active':''}" data-id="${esc(t.id)}">
+      <div class="avatar">${esc(initials(tName(t)))}</div>
+      <div class="t-info"><div class="t-name">${esc(tName(t))}</div><div class="t-sub">${(t.room||t.roomNumber)?'Room '+esc(t.room||t.roomNumber):billsFor(t).length+' billing(s)'}</div></div>
+      ${d?`<span class="t-due">${d} due</span>`:''}</button>`}).join('')
+    :'<div class="no-bills" style="padding:30px 10px">No tenants found.</div>';
 }
 
-// ════════════════════════════════════════════════════════════════
-// CLOUDINARY UPLOAD
-// Image goes to Cloudinary (web) → returns a public https:// URL
-// That URL is saved in Firestore — tiny, no size limit issues
-// Landlord fetches the URL from Firestore → image loads from web
-// ════════════════════════════════════════════════════════════════
-function uploadToCloudinary(file, onProgress) {
-    return new Promise((resolve, reject) => {
-        const url      = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-        formData.append('folder', 'rental_receipts');
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
-
-        xhr.upload.onprogress = e => {
-            if (e.lengthComputable && onProgress)
-                onProgress(Math.round((e.loaded / e.total) * 100));
-        };
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const data = JSON.parse(xhr.responseText);
-                resolve(data.secure_url); // public https:// URL
-            } else {
-                reject(new Error('Cloudinary error ' + xhr.status + ': ' + xhr.responseText));
-            }
-        };
-
-        xhr.onerror = () => reject(new Error('Network error. Check your internet connection.'));
-        xhr.send(formData);
-    });
+function renderDetail(){
+  const t=selected(), p=$('detailPanel');
+  if(!t){p.innerHTML='<div class="detail-empty"><i class="fas fa-user-check"></i>Select a tenant to see their billing.</div>';return}
+  const list=billsFor(t).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  const total=list.reduce((s,b)=>s+(parseFloat(b.amount)||0),0);
+  const paid=list.reduce((s,b)=>s+paidOf(b),0);
+  const isL=role!=='tenant';
+  p.innerHTML=`
+    <div class="detail-head">
+      <div class="detail-title"><div class="avatar">${esc(initials(tName(t)))}</div>
+        <div><h2>${esc(tName(t))}</h2><span>${(t.room||t.roomNumber)?'Room '+esc(t.room||t.roomNumber)+' · ':''}${list.length} billing${list.length!==1?'s':''}</span></div></div>
+      ${isL?'<button class="btn btn-primary" id="addBillBtn"><i class="fas fa-plus"></i> Add billing</button>':''}
+    </div>
+    <div class="summary">
+      <div class="stat"><div class="stat-label">Total billed</div><div class="stat-val">${peso(total)}</div></div>
+      <div class="stat"><div class="stat-label">Paid</div><div class="stat-val paid">${peso(paid)}</div></div>
+      <div class="stat"><div class="stat-label">Balance due</div><div class="stat-val pending">${peso(total-paid)}</div></div>
+    </div>
+    <div class="bills">${list.length?list.map(b=>`
+      <div class="bill" data-id="${esc(b.id)}">
+        <div class="bill-left"><div class="bill-icon"><i class="fas fa-file-invoice"></i></div>
+          <div style="min-width:0"><div class="bill-desc">${esc(b.description||'Billing')}</div>
+          <div class="bill-meta">${b.dueDate?'Due '+esc(b.dueDate):'Added '+esc(b.date||'—')}${String(b.status||'').toLowerCase()!=='paid'&&paidOf(b)>0?' · '+peso(paidOf(b))+' paid':''}</div></div></div>
+        <div class="bill-right">
+          ${badgeHtml(b)}
+          <div class="bill-amount">${peso(b.amount)}</div>
+          ${isL?`<div class="action-menu"><button class="menu-btn" data-act="menu"><i class="fas fa-ellipsis-v"></i></button>
+            <div class="dropdown-menu">
+              <button class="menu-item" data-act="toggle"><i class="fas fa-check-circle"></i> Mark as ${String(b.status||'').toLowerCase()==='paid'?'pending':'paid'}</button>
+              <button class="menu-item" data-act="edit"><i class="fas fa-edit"></i> Edit</button>
+              <button class="menu-item danger" data-act="delete"><i class="fas fa-trash"></i> Delete</button>
+            </div></div>`:''}
+        </div></div>`).join(''):
+      `<div class="no-bills"><i class="fas fa-receipt"></i>No billing for this tenant yet.${isL?' Use <b>Add billing</b> to create one.':''}</div>`}
+    </div>${role==='tenant'?mySubsHtml():''}`;
 }
 
-// ── Header actions (role-based) ────────────────────────────────
-async function renderHeaderActions() {
-    const area = document.getElementById('headerActions');
-    if (userRole === 'tenant') {
-        area.innerHTML = `
-            <button class="hdr-btn hdr-btn-outline" id="uploadReceiptBtn">
-                <i class="fas fa-upload"></i> Upload Receipt
-            </button>`;
-        document.getElementById('uploadReceiptBtn').addEventListener('click', () => uploadOverlay.classList.add('open'));
-    } else {
-        let count = 0;
-        try { const snap = await submissionsCol.get(); count = snap.size; } catch(e) {}
-        const badge = count ? `<span class="submitted-badge">${count}</span>` : '';
-        area.innerHTML = `
-            <button class="hdr-btn hdr-btn-outline" id="viewSubmittedBtn">
-                <i class="fas fa-images"></i> View Submitted${badge}
-            </button>`;
-        document.getElementById('viewSubmittedBtn').addEventListener('click', openViewModal);
+function select(id){selectedId=id;renderTenants();renderDetail()}
+
+async function findTenantForUser(){
+  const requestedId=me.tenantId||me.uid;
+  if(requestedId){
+    try{
+      const snap=await tenantsCol.doc(requestedId).get();
+      if(snap.exists)return {id:snap.id,...snap.data()};
+    }catch(error){console.warn('Could not look up tenant profile by ID:',error)}
+  }
+  const email=norm(me.email);
+  if(email){
+    try{
+      const snap=await tenantsCol.where('email','==',email).limit(2).get();
+      if(snap.size===1)return {id:snap.docs[0].id,...snap.docs[0].data()};
+    }catch(error){console.warn('Could not look up tenant profile by email:',error)}
+  }
+  const name=norm(me.name||me.username);
+  if(name){
+    try{
+      const snap=await tenantsCol.where('name','==',me.name||me.username).limit(2).get();
+      if(snap.size===1)return {id:snap.docs[0].id,...snap.docs[0].data()};
+    }catch(error){console.warn('Could not look up tenant profile by name:',error)}
+    const firstName=String(me.name||me.username).trim().split(/\s+/)[0];
+    if(firstName){
+      try{
+        const snap=await tenantsCol.where('firstName','==',firstName).limit(25).get();
+        const matches=snap.docs.map(d=>({id:d.id,...d.data()})).filter(t=>norm(tName(t))===name);
+        if(matches.length===1)return matches[0];
+      }catch(error){console.warn('Could not look up legacy tenant profile:',error)}
     }
+  }
+  return null;
 }
 
-// ── Load user profile ──────────────────────────────────────────
-function loadUserProfile() {
-    const userData = JSON.parse(sessionStorage.getItem('userData') || localStorage.getItem('userData') || 'null');
-    if (!userData) { window.location.replace('index.html'); return; }
-
-    userRole = userData.role || 'landlord';
-    document.getElementById('userProfileName').textContent  = userData.username || userData.name || 'User';
-    document.getElementById('userProfileEmail').textContent = userData.email || '';
-
-    const parts = (userData.name || '').trim().split(' ').filter(Boolean);
-    let initials = '';
-    if (parts.length >= 2) {
-        initials = (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
-    } else if (userData.email) {
-        const eu = userData.email.split('@')[0].replace(/[0-9]/g,'');
-        const ep = eu.match(/[a-z]+/gi) || [];
-        initials = ep.length >= 2 ? (ep[0][0]+ep[1][0]).toUpperCase() : eu.slice(0,2).toUpperCase();
-    } else {
-        initials = (userData.name||'U').slice(0,2).toUpperCase();
-    }
-    document.getElementById('userAvatar').textContent = initials;
-
-    if (userRole === 'tenant') {
-        const fc = document.getElementById('floatingContainer');
-        if (fc) {
-            fc.innerHTML = `<button class="floating-btn" id="view-landlord-btn"><i class="fas fa-building"></i> Pay Now</button>`;
-            document.getElementById('view-landlord-btn').addEventListener('click', () => landlordModal.classList.add('open'));
+async function load(){
+  try{
+    if(role==='tenant'){
+      const [tenant,bs]=await Promise.all([findTenantForUser(),billsCol.get()]);
+      bills=bs.docs.map(d=>({id:d.id,...d.data()}));
+      tenantIdentityMatched=Boolean(tenant);
+      tenants=[tenant||{id:me.tenantId||me.uid||'me',name:me.name||me.username||'Me',room:me.room,legacy:true}];
+      tenantDirectory=tenants;
+      bills=bills.filter(b=>belongsToTenant(b,tenants[0]));
+      selectedId=tenants[0].id;
+      const ss=await subsCol.get();
+      mySubs=ss.docs.map(d=>({id:d.id,...d.data()}))
+        .filter(x=>belongsToTenant(x,tenants[0]))
+        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      $('uName').value=tName(tenants[0]);
+    }else{
+      const [ts,bs]=await Promise.all([tenantsCol.get(),billsCol.get()]);
+      bills=bs.docs.map(d=>({id:d.id,...d.data()}));
+      tenantDirectory=ts.docs.map(d=>({id:d.id,...d.data()}));
+      tenants=[...tenantDirectory].sort((a,b)=>tName(a).localeCompare(tName(b)));
+      // Receipts for people not in the tenants list still show up
+      const known=new Set(tenants.map(tenantNameKey));
+      bills.forEach(b=>{
+        if(!b.tenantId&&b.name&&!known.has(tenantNameKey({name:b.name}))){
+          known.add(tenantNameKey({name:b.name}));
+          tenants.push({id:'legacy:'+norm(b.name),name:b.name,legacy:true});
         }
+      });
+      tenantDirectory=tenants;
     }
-
-    renderHeaderActions();
-}
-
-// ── Render receipt card ────────────────────────────────────────
-function renderReceipt(docId, data, prepend = true) {
-    if (document.querySelector(`[data-receipt-id="${docId}"]`)) return;
-    const card = document.createElement('div');
-    card.className = 'receipt-card';
-    card.setAttribute('data-receipt-id', docId);
-
-    const amount     = parseFloat(data.amount||0).toLocaleString('en-PH',{minimumFractionDigits:2});
-    const badgeClass = data.status === 'paid' ? 'badge-paid' : 'badge-pending';
-    const badgeLabel = data.status === 'paid' ? 'Paid' : 'Pending';
-    const isLandlord = userRole !== 'tenant';
-
-    card.innerHTML = `
-        <div class="receipt-left">
-            <div class="receipt-icon"><i class="fas fa-receipt"></i></div>
-            <div class="receipt-info">
-                <div class="receipt-desc">${data.description||'Receipt'}</div>
-                <div class="receipt-meta">${data.name||'—'} · ${data.date||'—'}</div>
-            </div>
-        </div>
-        <div class="receipt-right">
-            <span class="receipt-badge ${badgeClass}">${badgeLabel}</span>
-            <div class="receipt-amount">₱${amount}</div>
-            <div class="action-menu ${isLandlord?'':'hidden-for-tenant'}">
-                <button class="menu-btn" onclick="togglePaymentMenu(event)"><i class="fas fa-ellipsis-v"></i></button>
-                <div class="dropdown-menu">
-                    <button class="menu-item" onclick="openEditModal(event)"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="menu-item delete-btn" onclick="deleteReceipt(event)"><i class="fas fa-trash"></i> Delete</button>
-                </div>
-            </div>
-        </div>`;
-    if (prepend) list.prepend(card); else list.appendChild(card);
-    updateCountBadge();
-}
-
-// ── Load receipts ──────────────────────────────────────────────
-async function loadReceipts() {
-    loadingWrap.style.display = 'flex';
-    emptyWrap.style.display   = 'none';
-    list.innerHTML            = '';
-    try {
-        const snapshot = await receiptsCol.orderBy('createdAt','desc').get();
-        loadingWrap.style.display = 'none';
-        if (snapshot.empty) { emptyWrap.style.display = 'flex'; return; }
-        snapshot.forEach(doc => renderReceipt(doc.id, doc.data(), false));
-    } catch(err) {
-        loadingWrap.style.display = 'none';
-        emptyWrap.style.display   = 'flex';
-        showToast('Failed to load receipts.', 'error');
+    renderTenants();
+    renderDetail();
+    if(role==='tenant'&&!tenantIdentityMatched){
+      toast('Tenant profile not linked. Ask your landlord to add your account email on the Tenants page.','error');
     }
+  }catch(e){
+    console.error('Payment page load error:',e);
+    $('tenantList').innerHTML='<div class="no-bills">Could not load tenants or billing. Check your connection and refresh.</div>';
+    toast('Failed to load payment data: '+e.message,'error');
+  }
 }
 
-// ── Add receipt modal ──────────────────────────────────────────
-addBtn.addEventListener('click', () => {
-    editingId = null;
-    document.getElementById('modal-title').textContent = 'Add Receipt';
-    ['tenant-name','amount','description'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('status').value = 'paid';
-    modal.classList.add('open');
-});
-cancelBtn.addEventListener('click', () => modal.classList.remove('open'));
-modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
-
-function openEditModal(event) {
-    event.preventDefault();
-    const card = event.currentTarget.closest('.receipt-card');
-    editingId  = card.getAttribute('data-receipt-id');
-    document.getElementById('modal-title').textContent = 'Edit Receipt';
-    document.getElementById('tenant-name').value  = card.querySelector('.receipt-meta').textContent.split(' · ')[0].trim();
-    document.getElementById('amount').value        = card.querySelector('.receipt-amount').textContent.replace('₱','').replace(/,/g,'');
-    document.getElementById('description').value  = card.querySelector('.receipt-desc').textContent;
-    document.getElementById('status').value        = card.querySelector('.receipt-badge').classList.contains('badge-paid') ? 'paid' : 'pending';
-    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-    modal.classList.add('open');
+// ── Billing add/edit ──
+function openBill(b){
+  const t=selected();if(!t)return;
+  editingId=b?b.id:null;
+  $('billTitle').textContent=b?'Edit billing':'Add billing';
+  $('billTenant').textContent='Tenant: '+tName(t);
+  $('bDesc').value=b?.description||'';$('bAmount').value=b?.amount||'';
+  $('bDue').value=b?.dueDate||'';$('bStatus').value=String(b?.status||'pending').toLowerCase();
+  $('billModal').classList.add('open');
 }
-
-saveBtn.addEventListener('click', async () => {
-    const name   = document.getElementById('tenant-name').value.trim();
-    const amount = document.getElementById('amount').value.trim();
-    const desc   = document.getElementById('description').value.trim() || 'Receipt';
-    const status = document.getElementById('status').value;
-    if (!name || !amount) { showToast('Please fill in Tenant Name and Amount.','error'); return; }
-
-    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
-    const now = new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
-    try {
-        if (editingId) {
-            await receiptsCol.doc(editingId).update({name,amount,description:desc,status,date:now});
-            const card = document.querySelector(`[data-receipt-id="${editingId}"]`);
-            if (card) {
-                card.querySelector('.receipt-desc').textContent = desc;
-                card.querySelector('.receipt-meta').textContent = `${name} · ${now}`;
-                const badge = card.querySelector('.receipt-badge');
-                badge.className   = `receipt-badge ${status==='paid'?'badge-paid':'badge-pending'}`;
-                badge.textContent = status === 'paid' ? 'Paid' : 'Pending';
-                card.querySelector('.receipt-amount').textContent = '₱' + parseFloat(amount).toLocaleString('en-PH',{minimumFractionDigits:2});
-            }
-            showToast('Receipt updated!','success');
-        } else {
-            const docRef = await receiptsCol.add({name,amount,description:desc,status,date:now,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-            emptyWrap.style.display = 'none';
-            renderReceipt(docRef.id,{name,amount,description:desc,status,date:now});
-            showToast('Receipt added!','success');
-        }
-        modal.classList.remove('open');
-    } catch(err) {
-        showToast('Failed to save receipt.','error');
-    } finally {
-        saveBtn.disabled = false; saveBtn.textContent = 'Save';
+$('bCancel').onclick=()=>$('billModal').classList.remove('open');
+$('bSave').onclick=async()=>{
+  const t=selected(),desc=$('bDesc').value.trim(),amount=$('bAmount').value.trim();
+  const numericAmount=Number(amount);
+  if(!t){toast('Select a tenant first.','error');return}
+  if(!desc||!Number.isFinite(numericAmount)||numericAmount<=0){toast('Enter a description and a valid amount greater than zero.','error');return}
+  const data={tenantId:t.legacy?'':t.id,name:tName(t),description:desc,amount:numericAmount,dueDate:$('bDue').value,status:$('bStatus').value};
+  const old=bills.find(b=>b.id===editingId);
+  data.paidAmount=data.status==='paid'?numericAmount:Math.min(numericAmount,old&&String(old.status||'').toLowerCase()!=='paid'?(parseFloat(old.paidAmount)||0):0);
+  const btn=$('bSave');btn.disabled=true;btn.textContent='Saving…';
+  try{
+    if(editingId){await billsCol.doc(editingId).update(data);Object.assign(bills.find(b=>b.id===editingId),data);toast('Billing updated.','success')}
+    else{
+      data.date=new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+      data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+      const r=await billsCol.add(data);bills.push({id:r.id,...data,createdAt:{seconds:Date.now()/1000}});toast('Billing added.','success');
     }
-});
+    $('billModal').classList.remove('open');renderTenants();renderDetail();
+  }catch(e){toast('Failed to save billing.','error')}
+  finally{btn.disabled=false;btn.textContent='Save billing'}
+};
 
-async function deleteReceipt(event) {
-    event.preventDefault();
-    const card       = event.currentTarget.closest('.receipt-card');
-    const docId      = card.getAttribute('data-receipt-id');
-    const tenantName = card.querySelector('.receipt-meta').textContent.split(' · ')[0].trim();
-    if (!confirm(`Delete ${tenantName}'s receipt?`)) return;
-    card.style.animation = 'fadeOut 0.3s ease forwards';
-    setTimeout(async () => {
-        try {
-            await receiptsCol.doc(docId).delete();
-            card.remove(); updateCountBadge();
-            if (!list.children.length) emptyWrap.style.display = 'flex';
-            showToast('Receipt deleted.','success');
-        } catch(err) {
-            showToast('Failed to delete.','error');
-            card.style.animation = '';
-        }
-    }, 300);
+// ── Clicks ──
+$('tenantList').addEventListener('click',e=>{const b=e.target.closest('.tenant-item');if(b)select(b.dataset.id)});
+$('tenantSearch').addEventListener('input',renderTenants);
+$('detailPanel').addEventListener('click',async e=>{
+  if(e.target.closest('#addBillBtn')){openBill();return}
+  const btn=e.target.closest('[data-act]');if(!btn)return;
+  const row=btn.closest('.bill'),b=bills.find(x=>x.id===row.dataset.id),act=btn.dataset.act;
+  if(act==='menu'){
+    e.stopPropagation();const m=btn.nextElementSibling;
+    document.querySelectorAll('.dropdown-menu').forEach(x=>{if(x!==m)x.classList.remove('show')});
+    m.classList.toggle('show');return;
+  }
+  document.querySelectorAll('.dropdown-menu').forEach(x=>x.classList.remove('show'));
+  if(act==='edit')openBill(b);
+  if(act==='toggle'){
+    const s=String(b.status||'').toLowerCase()==='paid'?'pending':'paid';
+    try{const pa=s==='paid'?(parseFloat(b.amount)||0):0;await billsCol.doc(b.id).update({status:s,paidAmount:pa});b.status=s;b.paidAmount=pa;renderTenants();renderDetail();toast('Marked as '+s+'.','success')}
+    catch(_){toast('Failed to update.','error')}
+  }
+  if(act==='delete'){
+    if(!confirm(`Delete "${b.description||'this billing'}"?`))return;
+    try{await billsCol.doc(b.id).delete();bills=bills.filter(x=>x.id!==b.id);renderTenants();renderDetail();toast('Billing deleted.','success')}
+    catch(_){toast('Failed to delete.','error')}
+  }
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.action-menu'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('show'))});
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+// ── Tenant: upload receipt ──
+function uploadToCloudinary(file){
+  return new Promise((res,rej)=>{
+    const fd=new FormData();fd.append('file',file);fd.append('upload_preset',PRESET);fd.append('folder','rental_receipts');
+    const x=new XMLHttpRequest();x.open('POST',`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+    x.onload=()=>x.status===200?res(JSON.parse(x.responseText).secure_url):rej(new Error('Cloudinary error '+x.status));
+    x.onerror=()=>rej(new Error('Network error.'));x.send(fd);
+  });
 }
-
-function togglePaymentMenu(event) {
-    event.preventDefault(); event.stopPropagation();
-    const menu = event.currentTarget.nextElementSibling;
-    document.querySelectorAll('.dropdown-menu').forEach(m => { if (m !== menu) m.classList.remove('show'); });
-    menu.classList.toggle('show');
-}
-document.addEventListener('click', e => {
-    if (!e.target.closest('.action-menu'))
-        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-});
-
-// ── File preview ───────────────────────────────────────────────
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadPreview(fileInput.files[0]); });
-document.getElementById('removeImg').addEventListener('click', clearPreview);
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-    e.preventDefault(); dropZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) loadPreview(file);
-});
-
-function loadPreview(file) {
-    uploadedFile = file;
-    const reader = new FileReader();
-    reader.onload = e => {
-        previewImg.src = e.target.result;
-        previewWrap.style.display = 'block';
-        dropZone.style.display    = 'none';
+$('file').onchange=e=>{upFile=e.target.files[0]||null;$('dropText').textContent=upFile?upFile.name:'Click or drag an image here'};
+$('uCancel').onclick=()=>$('uploadModal').classList.remove('open');
+$('uSubmit').onclick=async()=>{
+  const tenant=tenants[0],name=tenant?tName(tenant):'';
+  if(!upFile){toast('Select an image.','error');return}
+  if(!upFile.type.startsWith('image/')){toast('Select an image file.','error');return}
+  if(upFile.size>10*1024*1024){toast('Receipt images must be 10 MB or smaller.','error');return}
+  if(!tenant){toast('Your tenant profile is still loading. Try again shortly.','error');return}
+  if(!name){toast('Enter your name.','error');return}
+  const amt=Number($('uAmount').value);
+  if(!Number.isFinite(amt)||amt<=0){toast('Enter a valid amount greater than zero.','error');return}
+  const billId=$('uBill').value;
+  const tenantBills=billsFor(tenant).filter(unpaid);
+  if(billId&&!tenantBills.some(b=>b.id===billId)){toast('That billing is not assigned to your account.','error');return}
+  const balance=tenantBills.reduce((sum,b)=>sum+Math.max(0,(parseFloat(b.amount)||0)-paidOf(b)),0);
+  if(balance<=0){toast('There is no unpaid billing linked to your tenant account.','error');return}
+  if(balance>0&&amt>balance+0.005){toast('The amount cannot exceed your remaining balance of '+peso(balance)+'.','error');return}
+  const btn=$('uSubmit');btn.disabled=true;btn.textContent='Uploading…';
+  try{
+    const imageUrl=await uploadToCloudinary(upFile);
+    const submission={
+      name,tenantId:tenant.legacy?'':tenant.id,tenantEmail:tenant.email||me.email||'',
+      billId,amount:amt,status:'pending',note:$('uNote').value.trim()||'(no note)',imageUrl,
+      date:new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
     };
-    reader.readAsDataURL(file);
-}
+    const ref=await subsCol.add(submission);
+    mySubs.unshift({id:ref.id,...submission,date:'Just now'});renderDetail();$('uAmount').value='';
+    upFile=null;$('file').value='';$('dropText').textContent='Click or drag an image here';$('uNote').value='';
+    $('uploadModal').classList.remove('open');toast('Receipt submitted to landlord.','success');
+  }catch(err){toast('Upload failed: '+err.message,'error')}
+  finally{btn.disabled=false;btn.textContent='Submit receipt'}
+};
 
-function clearPreview() {
-    uploadedFile = null;
-    previewImg.src = '';
-    previewWrap.style.display = 'none';
-    dropZone.style.display    = 'block';
-    fileInput.value = '';
-    document.getElementById('uploadProgress').style.display = 'none';
-    document.getElementById('progressBar').style.width      = '0%';
+// ── Landlord: review submitted receipts ──
+async function openSubmitted(){
+  const el=$('subList');el.innerHTML='<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading…</div>';
+  $('viewModal').classList.add('open');
+  try{
+    const r=await subsCol.get();
+    subs=r.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    renderSubs();
+  }catch(error){console.error('Submitted receipts load error:',error);el.innerHTML='<div class="no-bills">Failed to load submitted receipts.</div>';toast('Failed to load submitted receipts: '+error.message,'error')}
 }
-
-document.getElementById('cancelUploadBtn').addEventListener('click', () => {
-    clearPreview();
-    document.getElementById('uploaderName').value = '';
-    document.getElementById('uploadNote').value   = '';
-    uploadOverlay.classList.remove('open');
+function renderSubs(){
+  const el=$('subList');
+  if(!subs.length){el.innerHTML='<div class="no-bills"><i class="fas fa-inbox"></i>No submitted receipts yet.</div>';return}
+  el.innerHTML=subs.map(x=>{
+    const st=x.status||'pending',bill=x.billId&&bills.find(b=>b.id===x.billId);
+    const tenant=x.tenantId?tenantDirectory.find(t=>t.id===x.tenantId):tenantDirectory.find(t=>belongsToTenant(x,t));
+    return `<div class="sub-card">${x.imageUrl?`<img src="${esc(x.imageUrl)}" alt="Receipt">`:'<div class="no-bills">Receipt image unavailable.</div>'}
+      <div class="sub-info"><b>${esc(tenant?tName(tenant):x.name||'Unmatched tenant')}${x.amount?' · '+peso(x.amount):''}</b>
+      ${bill?`<div>For: ${esc(bill.description||'Billing')}</div>`:''}<div>${esc(x.note||'')}</div>
+      <div style="color:#aaa;margin-top:3px">${esc(x.date)}</div>
+      ${st==='pending'?`<div class="sub-actions"><button class="btn btn-ok" data-accept="${esc(x.id)}"><i class="fas fa-check"></i> Accept and deduct</button><button class="btn btn-no" data-reject="${esc(x.id)}"><i class="fas fa-times"></i> Reject</button></div>`
+      :`<div style="margin-top:8px">${subBadge(x)}${x.reason?' <span>Reason: '+esc(x.reason)+'</span>':''}</div><button class="link-danger" data-dismiss="${x.id}">✕ Remove from list</button>`}
+      </div></div>`}).join('');
+}
+async function acceptSub(id){
+  const s=subs.find(x=>x.id===id);
+  if(!s||String(s.status||'pending').toLowerCase()!=='pending'){toast('This receipt has already been reviewed.','error');return}
+  let amt=Number(s.amount);
+  if(!(Number.isFinite(amt)&&amt>0)){amt=Number(prompt('Amount paid (₱)?'));if(!(Number.isFinite(amt)&&amt>0))return}
+  const tenant=s.tenantId
+    ?tenantDirectory.find(t=>t.id===s.tenantId)
+    :tenantDirectory.find(t=>belongsToTenant(s,t));
+  if(!tenant){toast('Cannot match this receipt to a unique tenant. No billing was changed.','error');return}
+  const pool=billsFor(tenant).filter(unpaid).sort((a,b)=>{
+    if(a.id===s.billId)return -1;
+    if(b.id===s.billId)return 1;
+    const aDue=a.dueDate?Date.parse(a.dueDate):Infinity;
+    const bDue=b.dueDate?Date.parse(b.dueDate):Infinity;
+    if(aDue!==bDue)return aDue-bDue;
+    return (a.createdAt?.seconds||0)-(b.createdAt?.seconds||0);
+  });
+  if(s.billId&&!pool.some(b=>b.id===s.billId)&&!bills.some(b=>b.id===s.billId&&belongsToTenant(b,tenant))){
+    toast('The selected billing does not belong to this tenant. No billing was changed.','error');return
+  }
+  if(!pool.length){toast('This tenant has no unpaid billing.','error');return}
+  try{
+    const remaining=await db.runTransaction(async transaction=>{
+      const submissionRef=subsCol.doc(id);
+      const submissionSnap=await transaction.get(submissionRef);
+      if(!submissionSnap.exists||String(submissionSnap.data().status||'pending').toLowerCase()!=='pending'){
+        throw new Error('This receipt has already been reviewed.');
+      }
+      const submissionData=submissionSnap.data();
+      if(submissionData.tenantId
+        ?submissionData.tenantId!==tenant.id
+        :!belongsToTenant(submissionData,tenant)){
+        throw new Error('This receipt is not linked to the selected tenant.');
+      }
+      if(submissionData.billId!==s.billId)throw new Error('The receipt target billing changed. Reload and try again.');
+      const storedAmount=Number(submissionData.amount);
+      const approvedAmount=Number.isFinite(storedAmount)&&storedAmount>0?storedAmount:amt;
+      const billSnaps=[];
+      for(const bill of pool)billSnaps.push(await transaction.get(billsCol.doc(bill.id)));
+      let left=approvedAmount;
+      const changes=[];
+      billSnaps.forEach((snap,index)=>{
+        if(!snap.exists||left<=0.005)return;
+        const data=snap.data();
+        if(!belongsToTenant({...data,id:snap.id},tenant)||!unpaid(data))return;
+        const total=parseFloat(data.amount)||0;
+        const previouslyPaid=String(data.status||'').toLowerCase()==='paid'?total:(parseFloat(data.paidAmount)||0);
+        const applied=Math.min(Math.max(0,total-previouslyPaid),left);
+        if(applied<=0.005)return;
+        const paidAmount=previouslyPaid+applied;
+        const status=paidAmount>=total-0.005?'paid':'pending';
+        left-=applied;
+        changes.push({id:snap.id,paidAmount,status});
+      });
+      if(!changes.length)throw new Error('No unpaid billing remains for this tenant.');
+      changes.forEach(change=>transaction.update(billsCol.doc(change.id),{paidAmount:change.paidAmount,status:change.status}));
+      transaction.update(submissionRef,{status:'accepted',amount:approvedAmount,reviewedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      return {left,changes,amount:approvedAmount};
+    });
+    remaining.changes.forEach(change=>{
+      const bill=bills.find(x=>x.id===change.id);
+      if(bill){bill.paidAmount=change.paidAmount;bill.status=change.status}
+    });
+    s.status='accepted';s.amount=remaining.amount;
+    toast(remaining.left>0.005?'Accepted for this tenant. '+peso(remaining.left)+' could not be applied because the tenant has no remaining balance.':'Accepted and deducted from this tenant’s billing.','success');
+    renderTenants();renderDetail();renderSubs();updateSubCount();
+  }catch(error){console.error('Receipt approval failed:',error);toast('Failed to apply receipt: '+error.message,'error')}
+}
+async function rejectSub(id){
+  const reason=prompt('Reason for rejecting (optional):');if(reason===null)return;
+  try{
+    await subsCol.doc(id).update({status:'rejected',reason:reason.trim(),reviewedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const s=subs.find(x=>x.id===id);s.status='rejected';s.reason=reason.trim();
+    toast('Receipt rejected.','success');renderSubs();updateSubCount();
+  }catch(error){console.error('Receipt rejection failed:',error);toast('Failed to reject receipt: '+error.message,'error')}
+}
+$('subList').addEventListener('click',async e=>{
+  if(e.target.tagName==='IMG'){$('lightboxImg').src=e.target.src;$('lightbox').classList.add('open');return}
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.accept){t.disabled=true;try{await acceptSub(t.dataset.accept)}finally{if(t.isConnected)t.disabled=false}return}
+  if(t.dataset.reject){rejectSub(t.dataset.reject);return}
+  if(t.dataset.dismiss){
+    try{await subsCol.doc(t.dataset.dismiss).delete();subs=subs.filter(x=>x.id!==t.dataset.dismiss);renderSubs();updateSubCount()}
+    catch(error){console.error('Submitted receipt removal failed:',error);toast('Failed to remove receipt: '+error.message,'error')}
+  }
 });
-uploadOverlay.addEventListener('click', e => { if (e.target === uploadOverlay) uploadOverlay.classList.remove('open'); });
+$('viewClose').onclick=()=>$('viewModal').classList.remove('open');
+$('lightbox').onclick=()=>$('lightbox').classList.remove('open');
 
-// ── SUBMIT: Cloudinary → Firestore URL ────────────────────────
-document.getElementById('submitUploadBtn').addEventListener('click', async () => {
-    const name = document.getElementById('uploaderName').value.trim();
-    const note = document.getElementById('uploadNote').value.trim();
+async function updateSubCount(){
+  if(role==='tenant')return;
+  let n=0;try{n=(await subsCol.get()).docs.filter(d=>(d.data().status||'pending')==='pending').length}catch(_){}
+  $('actions').innerHTML=`<button class="btn btn-primary" id="viewSubBtn"><i class="fas fa-images"></i> View submitted ${n?`<span class="badge-count">${n}</span>`:''}</button>`;
+  $('viewSubBtn').onclick=openSubmitted;
+}
 
-    if (!uploadedFile) { showToast('Please select an image.','error'); return; }
-    if (!name)         { showToast('Please enter your name.','error'); return; }
-
-    const submitBtn   = document.getElementById('submitUploadBtn');
-    const progressEl  = document.getElementById('uploadProgress');
-    const progressBar = document.getElementById('progressBar');
-    const progressLbl = document.getElementById('progressLabel');
-
-    submitBtn.disabled    = true;
-    submitBtn.textContent = 'Uploading…';
-    progressEl.style.display = 'block';
-    progressLbl.textContent  = 'Uploading image to cloud…';
-
-    try {
-        // 1. Upload image file to Cloudinary — stored on the web
-        const imageUrl = await uploadToCloudinary(uploadedFile, pct => {
-            progressBar.style.width  = pct + '%';
-            progressLbl.textContent  = `Uploading… ${pct}%`;
-        });
-
-        progressBar.style.width  = '100%';
-        progressLbl.textContent  = 'Saving…';
-
-        // 2. Save just the URL to Firestore — no size limit, cross-browser
-        await submissionsCol.add({
-            name,
-            note: note || '(no note)',
-            imageUrl,
-            date: new Date().toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        clearPreview();
-        document.getElementById('uploaderName').value = '';
-        document.getElementById('uploadNote').value   = '';
-        uploadOverlay.classList.remove('open');
-        showToast('Receipt submitted to landlord!','success');
-
-    } catch(err) {
-        console.error('Upload error:', err);
-        showToast('Upload failed: ' + err.message, 'error');
-    } finally {
-        submitBtn.disabled    = false;
-        submitBtn.textContent = 'Submit';
-        progressEl.style.display = 'none';
-        progressBar.style.width  = '0%';
-    }
+// ── Tenant: pay now ──
+document.querySelectorAll('.pm-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.pm-btn').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.pm-details').forEach(d=>d.classList.remove('show'));
+  $('pm-'+b.dataset.m).classList.add('show');
 });
+document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{
+  const t=$(b.dataset.copy).textContent;navigator.clipboard.writeText(t).then(()=>toast('Copied: '+t,'success'));
+});
+$('payClose').onclick=()=>$('payModal').classList.remove('open');
 
-// ── View Submitted (Landlord) ──────────────────────────────────
-async function openViewModal() {
-    const listEl = document.getElementById('submittedList');
-    listEl.innerHTML = '<div class="loading-wrap"><i class="fas fa-spinner fa-spin"></i> Loading…</div>';
-    viewOverlay.classList.add('open');
-
-    try {
-        const snapshot = await submissionsCol.orderBy('createdAt','desc').get();
-        listEl.innerHTML = '';
-
-        if (snapshot.empty) {
-            listEl.innerHTML = '<div class="no-submissions"><i class="fas fa-inbox"></i>No submitted receipts yet.</div>';
-            return;
-        }
-
-        snapshot.forEach(doc => {
-            const s   = doc.data();
-            const sid = doc.id;
-            const card = document.createElement('div');
-            card.className = 'submitted-card';
-            card.setAttribute('data-sid', sid);
-            card.innerHTML = `
-                <img class="submitted-img" src="${s.imageUrl}" alt="Receipt">
-                <div class="submitted-info">
-                    <div class="submitted-tenant"><i class="fas fa-user" style="color:#2C96CD;margin-right:5px;font-size:11px"></i>${s.name}</div>
-                    <div class="submitted-note">${s.note}</div>
-                    <div class="submitted-date">${s.date}</div>
-                    <button class="submitted-dismiss" data-sid="${sid}">✕ Dismiss</button>
-                </div>`;
-            listEl.appendChild(card);
-        });
-
-        listEl.querySelectorAll('.submitted-img').forEach(img => {
-            img.addEventListener('click', () => {
-                document.getElementById('lightboxImg').src = img.src;
-                lightbox.classList.add('open');
-            });
-        });
-
-        listEl.querySelectorAll('.submitted-dismiss').forEach(btn => {
-            btn.addEventListener('click', () => dismissSubmission(btn.getAttribute('data-sid')));
-        });
-
-    } catch(err) {
-        listEl.innerHTML = '<div class="no-submissions"><i class="fas fa-exclamation-circle"></i> Failed to load.</div>';
-    }
-}
-
-async function dismissSubmission(sid) {
-    try {
-        await submissionsCol.doc(sid).delete();
-        const card = document.querySelector(`[data-sid="${sid}"]`);
-        if (card) card.remove();
-        const listEl = document.getElementById('submittedList');
-        if (!listEl.children.length)
-            listEl.innerHTML = '<div class="no-submissions"><i class="fas fa-inbox"></i>No submitted receipts yet.</div>';
-        renderHeaderActions();
-        showToast('Receipt dismissed.','success');
-    } catch(err) {
-        showToast('Failed to dismiss.','error');
-    }
-}
-
-document.getElementById('closeViewModal').addEventListener('click', () => viewOverlay.classList.remove('open'));
-viewOverlay.addEventListener('click', e => { if (e.target === viewOverlay) viewOverlay.classList.remove('open'); });
-lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
-
-// ── Landlord modal ─────────────────────────────────────────────
-document.getElementById('closeLandlordModal').addEventListener('click', () => landlordModal.classList.remove('open'));
-landlordModal.addEventListener('click', e => { if (e.target === landlordModal) landlordModal.classList.remove('open'); });
-
-function selectPaymentMethod(event, method) {
-    document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.landlord-details').forEach(d => { d.style.display='none'; d.classList.remove('show'); });
-    event.currentTarget.classList.add('active');
-    const target = method === 'gcash' ? 'gcashDetails' : 'bankDetails';
-    document.getElementById(target).style.display = 'block';
-    document.getElementById(target).classList.add('show');
-}
-
-function copyToClipboard(elementId) {
-    const text = document.getElementById(elementId).textContent;
-    navigator.clipboard.writeText(text).then(() => showToast('Copied: ' + text,'success'));
-}
-
-// ── Init ───────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    loadUserProfile();
-    loadReceipts();
+// ── Init ──
+document.addEventListener('DOMContentLoaded',()=>{
+  const u=JSON.parse(sessionStorage.getItem('userData')||localStorage.getItem('userData')||'null');
+  if(!u){location.replace('index.html');return}
+  me=u;role=u.role||'landlord';
+  $('userProfileName').textContent=u.username||u.name||'User';
+  $('userProfileEmail').textContent=u.email||'';
+  $('userAvatar').textContent=initials(u.name||u.username||u.email||'U');
+  if(role==='tenant'){
+    $('payBody').classList.add('single');$('tenantPanel').style.display='none';$('uName').value=u.name||'';
+    $('uName').readOnly=true;
+    $('actions').innerHTML=`<button class="btn btn-outline" id="upBtn" style="background:#fff"><i class="fas fa-upload"></i> Upload receipt</button>
+      <button class="btn btn-primary" id="payBtn"><i class="fas fa-building"></i> Pay now</button>`;
+    $('upBtn').onclick=()=>{
+      const t=tenants[0];
+      if(!t){toast('Your tenant profile is still loading. Try again shortly.','error');return}
+      const open=billsFor(t).filter(unpaid).sort((a,b)=>{
+        const aDue=a.dueDate?Date.parse(a.dueDate):Infinity;
+        const bDue=b.dueDate?Date.parse(b.dueDate):Infinity;
+        return aDue-bDue||(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0);
+      });
+      $('uBill').innerHTML='<option value="">Apply to oldest unpaid billing first</option>'+open.map(b=>`<option value="${esc(b.id)}">${esc(b.description||'Billing')} (${peso(Math.max(0,(parseFloat(b.amount)||0)-paidOf(b)))} left)</option>`).join('');
+      $('uBill').value=open[0]?.id||'';
+      $('uAmount').value='';
+      $('uNote').value='';
+      upFile=null;$('file').value='';$('dropText').innerHTML='<b style="color:#2C96CD">Click or drag</b> an image here';
+      $('uploadModal').classList.add('open');
+    };
+    $('payBtn').onclick=()=>$('payModal').classList.add('open');
+  }else updateSubCount();
+  renderDetail();load();
 });
 </script>
 <script src="sidebar.js"></script>

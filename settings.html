@@ -211,6 +211,39 @@
         .settings-toast-success { background: #e6f9ee; color: #1a7a41; border: 1px solid #b2e8c8; }
         .settings-toast-error   { background: #fff3f3; color: #d32f2f; border: 1px solid #fbc4c4; }
 
+        .appearance-description { font-size: 12px; color: #888; margin-top: 4px; }
+
+        html[data-theme="dark"] body { background: #111827; color: #e5e7eb; }
+        html[data-theme="dark"] .dashboard-header,
+        html[data-theme="dark"] .settings-card,
+        html[data-theme="dark"] .s-modal {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        html[data-theme="dark"] .page-body { background: #111827; }
+        html[data-theme="dark"] .settings-page-title,
+        html[data-theme="dark"] .settings-card-header-title,
+        html[data-theme="dark"] .user-profile-name,
+        html[data-theme="dark"] .s-modal-title { color: #f3f4f6; }
+        html[data-theme="dark"] .settings-card-header,
+        html[data-theme="dark"] .notif-row { border-color: #374151; }
+        html[data-theme="dark"] .notif-label { color: #e5e7eb; }
+        html[data-theme="dark"] .appearance-description,
+        html[data-theme="dark"] .user-profile-email { color: #9ca3af; }
+        html[data-theme="dark"] .s-form-input,
+        html[data-theme="dark"] .s-form-select,
+        html[data-theme="dark"] .s-modal-input {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        html[data-theme="dark"] .s-modal-input[readonly] { background: #374151; color: #9ca3af; }
+        html[data-theme="dark"] .s-modal-close:hover { color: #f3f4f6; }
+        html[data-theme="dark"] .appearance-toggle input:focus-visible + .toggle-track {
+            outline: 2px solid #5bbfed;
+            outline-offset: 3px;
+        }
+
         @keyframes toastIn {
             from { opacity: 0; transform: translateY(12px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -260,6 +293,25 @@
                     <!-- Landlord: 3-col with Save button | Tenant: 2-col no button -->
                     <div id="generalBottomRow">
                         <!-- Rendered by JS based on role -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <span class="settings-card-header-title">Appearance</span>
+                    <i class="fas fa-moon" aria-hidden="true"></i>
+                </div>
+                <div class="settings-card-body">
+                    <div class="notif-row">
+                        <div>
+                            <div class="notif-label">Dark mode</div>
+                            <div class="appearance-description">Use a darker theme across the dashboard.</div>
+                        </div>
+                        <label class="toggle-switch appearance-toggle">
+                            <input id="darkModeToggle" type="checkbox" role="switch" aria-label="Dark mode">
+                            <span class="toggle-track"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -404,10 +456,21 @@ function applyRoleSettings() {
 }
 
 applyRoleSettings();
+
+const darkModeToggle = document.getElementById('darkModeToggle');
+const savedTheme = localStorage.getItem('rms_theme') || 'light';
+document.documentElement.dataset.theme = savedTheme === 'dark' ? 'dark' : 'light';
+darkModeToggle.checked = savedTheme === 'dark';
+darkModeToggle.addEventListener('change', () => {
+    const theme = darkModeToggle.checked ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('rms_theme', theme);
+});
 </script>
 
 <script type="module" src="settings.js"></script>
 <script src="sidebar.js"></script>
+<script src="rental-assistant.js"></script>
 
 </body>
 </html>
