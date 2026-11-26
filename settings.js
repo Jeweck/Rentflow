@@ -99,21 +99,17 @@ window.saveGeneral = function () {
     };
     localStorage.setItem(GENERAL_KEY, JSON.stringify(data));
 
-    // ── Sync system name to index.html brand title ──────────────────────────
-    // index.html reads 'rms_system_name' on load and updates .brand-title spans
+    // Keep the configured name available to pages that use the system brand.
     localStorage.setItem('rms_system_name', systemName);
 
-    // If somehow we're on a page that has a .brand-title, update it live too
+    // Update the brand live on pages that expose a .brand-title.
     applySystemNameToBrand(systemName);
 
-    showToast('General settings saved! Login page title updated.', 'success');
+    showToast('General settings saved!', 'success');
 };
 
 /**
- * Writes the system name into .brand-title spans and shrinks lines 2-4
- * to fit the container — mirrors the logic in index.html.
- * Called after saveGeneral(), and exposed as window.applySystemNameToBrand
- * so index.html can invoke it too.
+ * Updates an optional .brand-title element on the current page.
  */
 function applySystemNameToBrand(name) {
     const el = document.querySelector('.brand-title');
